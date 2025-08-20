@@ -26,7 +26,7 @@ exports.up = async function (knex) {
   await knex.schema.createTable("usuarios", function (table) {
     table.increments("id").primary();
     table.string("nome").notNullable();
-    table.date("email").notNullable();
+    table.string("email").notNullable();
     table.string("senha").notNullable();
   });
 };
