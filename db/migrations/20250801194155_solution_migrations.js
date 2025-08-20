@@ -22,6 +22,13 @@ exports.up = async function (knex) {
       .notNullable()
       .onDelete("CASCADE");
   });
+
+  await knex.schema.createTable("usuarios", function (table) {
+    table.increments("id").primary();
+    table.string("nome").notNullable();
+    table.date("email").notNullable();
+    table.string("senha").notNullable();
+  });
 };
 
 /**
@@ -31,4 +38,5 @@ exports.up = async function (knex) {
 exports.down = async function (knex) {
   await knex.schema.dropTableIfExists("casos");
   await knex.schema.dropTableIfExists("agentes");
+  await knex.schema.dropTableIfExists("usuarios");
 };
