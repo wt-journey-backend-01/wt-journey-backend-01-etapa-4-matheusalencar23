@@ -3,11 +3,18 @@ const { AppError } = require("../utils/errorHandler");
 
 async function findByEmail(email) {
   try {
-    console.log(email);
-    const result = await db("usuarios")
-      .select("*")
-      .where({ nome: email })
-      .first();
+    const result = await db("usuarios").select("*").where({ email }).first();
+    return result;
+  } catch (error) {
+    throw new AppError(500, "Erro ao buscar usuário por email", [
+      error.message,
+    ]);
+  }
+}
+
+async function findByName(nome) {
+  try {
+    const result = await db("usuarios").select("*").where({ nome }).first();
     return result;
   } catch (error) {
     throw new AppError(500, "Erro ao buscar usuário por email", [
@@ -27,5 +34,6 @@ async function create(usuario) {
 
 module.exports = {
   findByEmail,
+  findByName,
   create,
 };
