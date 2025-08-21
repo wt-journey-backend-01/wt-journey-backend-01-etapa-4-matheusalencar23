@@ -6,9 +6,9 @@ const { AppError } = require("../utils/errorHandler");
 const SECRET = process.env.JWT_SECRET || "secret";
 
 async function login(req, res) {
-  const { email, senha } = req.body;
+  const { email, senha, nome } = req.body;
 
-  const usuario = await usuariosRepository.findByEmail(email);
+  const usuario = await usuariosRepository.findByEmail(nome);
 
   if (!usuario) {
     throw new AppError(
@@ -33,7 +33,7 @@ async function login(req, res) {
     { expiresIn: "1d" }
   );
 
-  res.status(200).json(token);
+  res.status(200).json({ acess_token: token });
 }
 
 async function signUp(req, res) {
