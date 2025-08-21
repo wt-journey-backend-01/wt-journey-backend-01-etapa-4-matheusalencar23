@@ -2,16 +2,14 @@
 
 # 🧪 Relatório de Avaliação – Journey Levty Etapa 1 - matheusalencar23
 
-**Data:** 21/08/2025 21:25
+**Data:** 21/08/2025 21:28
 
-**Nota Final:** `42.45/100`
+**Nota Final:** `44.20/100`
 **Status:** ❌ Reprovado
 
 ---
 ## ✅ Requisitos Obrigatórios
-- Foram encontrados `37` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
-  - ⚠️ **Falhou no teste**: `USERS: Recebe erro 400 ao tentar criar um usuário com e-mail já em uso`
-    - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
+- Foram encontrados `36` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
   - ⚠️ **Falhou no teste**: `AGENTS: Cria agentes corretamente com status code 201 e os dados inalterados do agente mais seu ID`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
   - ⚠️ **Falhou no teste**: `AGENTS: Lista todos os agente corretamente com status code 200 e todos os dados de cada agente listados corretamente`
