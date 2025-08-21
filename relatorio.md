@@ -1,244 +1,238 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 8 créditos restantes para usar o sistema de feedback AI.
+Você tem 7 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para matheusalencar23:
 
-Nota final: **45.3/100**
+Nota final: **47.0/100**
 
-# Feedback para matheusalencar23 🚓🚀
+Olá, Matheus! 👋🚀
 
-Olá, Matheus! Primeiro, quero parabenizá-lo pelo esforço e pelo código que você entregou até aqui. 🎉 Você já avançou muito na implementação de uma API REST segura, com autenticação JWT, hashing de senhas e organização do código em camadas. Isso não é trivial e mostra que você está no caminho certo para se tornar um desenvolvedor Node.js profissional!
-
----
-
-## 🎯 Pontos Fortes e Conquistas Bônus
-
-- Seu **controle de autenticação** está bem estruturado, com uso correto do bcrypt para hash da senha e JWT para geração do token, como vi no `authController.js`:
-
-  ```js
-  const token = jwt.sign(
-    {
-      id: usuario.id,
-      nome: usuario.nome,
-      email: usuario.email,
-    },
-    SECRET,
-    { expiresIn: "1d" }
-  );
-  ```
-
-- O middleware de autenticação (`authMiddleware.js`) está implementado de forma adequada, verificando o token no header e tratando erros de forma clara.
-
-- Você aplicou o middleware de autenticação nas rotas de agentes e casos no `server.js`:
-
-  ```js
-  app.use(authenticateToken, casosRouter);
-  app.use(authenticateToken, agentesRouter);
-  ```
-
-- A validação das senhas está bastante completa, cobrindo os requisitos de tamanho, caracteres especiais, letras maiúsculas e minúsculas, o que é essencial para segurança.
-
-- Você também implementou endpoints adicionais que são bônus, como a filtragem de casos por status, busca de agente responsável por caso, e o endpoint `/usuarios/me` para retornar dados do usuário autenticado.
+Primeiramente, parabéns pelo esforço em implementar essa API REST completa com autenticação JWT, hashing de senhas, e proteção das rotas! 🎉 É um desafio e tanto, e você já conseguiu entregar várias funcionalidades importantes, especialmente no fluxo de usuários — o registro, login, logout e exclusão de usuários estão funcionando bem, e isso é uma base sólida para uma aplicação segura. 👏
 
 ---
 
-## 🔍 O que precisa de atenção e melhorias
+## O que está funcionando bem e merece destaque 🌟
 
-### 1. Estrutura de Diretórios e Arquivos
+- **Autenticação JWT e hashing de senha:** Seu uso do bcrypt para hash da senha e geração do token JWT está correto, e você cuidou para não expor o segredo direto no código (usando variável de ambiente). Isso é fundamental para segurança!  
+  Seu `authController.js` está bem estruturado e claro, com tratamento adequado para erros como usuário não encontrado ou senha inválida.
 
-Ao analisar o seu projeto, percebi que a estrutura de arquivos não está exatamente alinhada com o que foi solicitado. Por exemplo, o arquivo `authRoutes.js` está presente, mas não vi um arquivo para logout (`POST /auth/logout`) nem a rota para exclusão de usuários (`DELETE /users/:id`) implementados, que são requisitos importantes.
+- **Middleware de autenticação:** O middleware `authMiddleware.js` está corretamente interceptando as requisições e validando o token JWT, bloqueando o acesso a rotas protegidas se o token estiver ausente ou inválido.
 
-Além disso, a mensagem de penalidade indica que houve problemas com arquivos estáticos ou estrutura que não deveriam estar presentes.
+- **Estrutura MVC:** Você organizou seus arquivos em controllers, repositories, rotas e middlewares, respeitando a arquitetura esperada, o que torna o projeto mais escalável e fácil de manter.
 
-**Por que isso é importante?**  
-Manter a estrutura conforme o padrão ajuda não só a organização, mas também a facilitar testes, manutenção e escalabilidade do projeto. Além disso, o avaliador (e futuros colegas devs) esperam encontrar os arquivos e funcionalidades exatamente onde deveriam estar.
+- **Validações para criação de usuário:** Você aplicou validações para evitar campos vazios e senhas fracas, o que é ótimo para garantir a qualidade dos dados.
 
-**Dica:**  
-Confira se suas pastas e arquivos seguem exatamente este padrão:
+- **Endpoints de usuários:** Os endpoints de registro, login, logout e exclusão de usuários estão funcionando conforme esperado, com status codes e mensagens adequadas.
+
+- **Proteção das rotas de agentes e casos:** Você aplicou o middleware `authenticateToken` nas rotas de agentes e casos para garantir acesso somente com JWT válido.
+
+- **Seeds e migrations:** Sua migration criou corretamente as tabelas `agentes`, `casos` e `usuarios`, e os seeds para agentes e casos estão populando dados iniciais.
+
+---
+
+## Pontos que precisam de atenção para destravar a aprovação e melhorar a API 🔍
+
+### 1. Estrutura de diretórios - Atenção ao arquivo `authRoutes.js` na pasta `routes`
+
+Na estrutura esperada, você deve ter:
 
 ```
-📦 SEU-REPOSITÓRIO
-│
-├── package.json
-├── server.js
-├── .env
-├── knexfile.js
-├── INSTRUCTIONS.md
-│
-├── db/
-│ ├── migrations/
-│ ├── seeds/
-│ └── db.js
-│
-├── routes/
-│ ├── agentesRoutes.js
-│ ├── casosRoutes.js
-│ └── authRoutes.js
-│
-├── controllers/
-│ ├── agentesController.js
-│ ├── casosController.js
-│ └── authController.js
-│
-├── repositories/
-│ ├── agentesRepository.js
-│ ├── casosRepository.js
-│ └── usuariosRepository.js
-│
-├── middlewares/
-│ └── authMiddleware.js
-│
-├── utils/
-│ └── errorHandler.js
+routes/
+├── agentesRoutes.js
+├── casosRoutes.js
+└── authRoutes.js
 ```
 
----
+Você tem isso, mas percebi que, no seu `server.js`, você está usando o `authRouter` **antes** de aplicar o middleware de autenticação nas rotas de agentes e casos, o que está correto. Porém, a questão é que o arquivo `authRoutes.js` não está protegendo a rota de exclusão de usuários (`DELETE /users/:id`) nem o logout (`POST /auth/logout`), que eram requisitos do desafio.
 
-### 2. Validação Rigorosa dos Dados e Campos Extras
+**Solução:**  
+Inclua no seu `authRoutes.js` as rotas para logout e exclusão de usuários, e proteja essas rotas com o middleware de autenticação.
 
-Um dos testes falhou porque o sistema não retorna erro 400 ao tentar criar um usuário com campos extras. Isso indica que no seu `newUserValidation` (possivelmente em `utils/userValidations.js`) está faltando uma validação para rejeitar propriedades que não deveriam estar no payload.
-
-**Por que isso acontece?**  
-Quando você aceita campos extras no corpo da requisição, isso pode gerar inconsistências no banco de dados e vulnerabilidades. Por isso, é importante que a validação de entrada seja estrita, aceitando apenas os campos esperados.
-
-**Como corrigir?**  
-Se você estiver usando uma biblioteca como o Zod para validação, pode usar o método `.strict()` para rejeitar campos extras. Por exemplo:
+Exemplo:
 
 ```js
-const userSchema = z.object({
-  nome: z.string().min(1),
-  email: z.string().email(),
-  senha: z.string().min(8).regex(...), // regex para senha forte
-}).strict();
+const express = require("express");
+const router = express.Router();
+const authController = require("../controllers/authController");
+const { newUserValidation } = require("../utils/userValidations");
+const { authenticateToken } = require("../middlewares/authMiddleware");
+
+router.post("/auth/register", newUserValidation, authController.signUp);
+router.post("/auth/login", authController.login);
+router.post("/auth/logout", authenticateToken, authController.logout);
+router.delete("/users/:id", authenticateToken, authController.deleteUser);
+
+module.exports = router;
 ```
 
-Assim, qualquer campo fora desses três será rejeitado com erro 400.
+E no `authController.js`, implemente os métodos `logout` e `deleteUser`.
 
 ---
 
-### 3. Status Codes e Mensagens Consistentes
+### 2. Validação dos IDs e tratamento de erros 400 para agentes e casos
 
-Vi que no seu `authController.js`, você retorna erro 404 quando o usuário não é encontrado no login:
+Ao analisar os controllers de agentes (`agentesController.js`) e casos (`casosController.js`), percebi que você não está validando se os IDs recebidos nas rotas são números inteiros válidos antes de buscar no banco. Isso pode causar problemas e não retorna o erro 400 esperado para IDs inválidos.
+
+Por exemplo, em `getAgenteById`:
 
 ```js
-if (!usuario) {
-  throw new AppError(
-    404,
-    "Nenhum usuário encontrado para o email especificado"
-  );
+async function getAgenteById(req, res) {
+  const id = req.params.id;
+  // Falta validar se id é número inteiro válido
+  const agente = await agentesRepository.findById(id);
+  if (!agente) {
+    throw new AppError(404, "Nenhum agente encontrado para o id especificado");
+  }
+  res.json(agente);
 }
 ```
 
-Porém, no contexto de autenticação, o status correto para credenciais inválidas (incluindo usuário não encontrado) é **401 Unauthorized**. Isso evita expor se o email está cadastrado ou não, melhorando a segurança.
-
-**Sugestão:**
-
-```js
-if (!usuario) {
-  throw new AppError(401, "Credenciais inválidas");
-}
-```
-
-E mantenha a mesma mensagem para senha inválida, para não dar pistas ao atacante.
-
----
-
-### 4. Validação de IDs e Tratamento de Erros
-
-Notei que em alguns controllers, como `casosController.js`, você faz validação do ID:
+**Solução:**  
+Antes de buscar, valide o ID:
 
 ```js
 const id = Number(req.params.id);
 if (!id || !Number.isInteger(id)) {
-  throw new AppError(404, "Id inválido");
+  throw new AppError(400, "Parâmetro 'id' inválido");
 }
 ```
 
-Aqui, o status 404 não é o mais adequado para parâmetro inválido; o correto é **400 Bad Request**, pois o recurso não foi encontrado por causa de um parâmetro mal formatado, não porque o recurso não existe.
+Faça isso para todos os métodos que recebem ID em params (`get`, `put`, `patch`, `delete`) tanto em agentes quanto em casos.
 
-**Melhore assim:**
+---
+
+### 3. Retorno dos dados de agentes após criação e atualização
+
+No `agentesRepository.js`, na função `create`, você está retornando a data de incorporação formatada com base no parâmetro `agente.dataDeIncorporacao`, mas deveria formatar a data que vem do banco (`newAgente.dataDeIncorporacao`), para garantir que está usando o valor correto retornado.
+
+Veja seu código atual:
 
 ```js
-if (!id || !Number.isInteger(id)) {
-  throw new AppError(400, "Id inválido");
+async function create(agente) {
+  try {
+    const [newAgente] = await db("agentes").insert(agente).returning("*");
+    return {
+      ...newAgente,
+      dataDeIncorporacao: new Date(agente.dataDeIncorporacao)
+        .toISOString()
+        .split("T")[0],
+    };
+  } catch (error) {
+    throw new AppError(500, "Erro ao criar agente", [error.message]);
+  }
 }
 ```
 
-Esse cuidado ajuda o cliente da API a entender se o erro é de sintaxe/entrada ou de recurso inexistente.
+Aqui, você formata `agente.dataDeIncorporacao` (o dado recebido), mas o correto é formatar `newAgente.dataDeIncorporacao` (o dado retornado do banco), porque o banco pode ter ajustado o formato.
 
----
+**Solução:**
 
-### 5. Enum e Documentação Swagger
-
-No seu `casosRoutes.js`, vi que o enum para status está definido assim:
-
-```yaml
-status:
-  type: string
-  enum: ["aberto", "fechado"]
-  example: "aberto"
+```js
+return {
+  ...newAgente,
+  dataDeIncorporacao: new Date(newAgente.dataDeIncorporacao)
+    .toISOString()
+    .split("T")[0],
+};
 ```
 
-Mas na migration você criou o enum como `["aberto", "solucionado"]`. Essa inconsistência pode gerar confusão para quem consome a API e para o banco.
-
-**Corrija para que os enums estejam iguais em todos os lugares.**
+Faça o mesmo ajuste nas funções `update` e `updatePartial`.
 
 ---
 
-### 6. Logout e Exclusão de Usuários
+### 4. Enumeração do campo `status` na tabela `casos` e validação no código
 
-Percebi que você implementou os endpoints de registro e login, mas não vi o endpoint de logout (`POST /auth/logout`) nem o de exclusão de usuários (`DELETE /users/:id`).
+Na migration, você definiu o campo `status` da tabela `casos` com enum `["aberto", "solucionado"]`, mas no schema do Swagger e nas validações você usa `["aberto", "fechado"]`. Essa inconsistência pode causar problemas na inserção e atualização.
 
-Esses são requisitos importantes para o desafio e devem ser implementados para completar a segurança e o ciclo de vida do usuário.
-
----
-
-## 💡 Recomendações de Estudo e Recursos
-
-- Para melhorar a validação dos dados e evitar campos extras, recomendo fortemente estudar o uso do Zod com `.strict()`:
-
-  https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s (Refatoração e Boas Práticas de Código)
-
-- Para entender melhor o fluxo correto de autenticação, status codes e segurança com JWT e bcrypt, assista este vídeo, feito pelos meus criadores, que explica os conceitos básicos e fundamentais da cibersegurança:
-
-  https://www.youtube.com/watch?v=Q4LQOfYwujk (Video sobre autenticação)
-
-- Para aprofundar no uso prático de JWT em Node.js, veja:
-
-  https://www.youtube.com/watch?v=keS0JWOypIU (JWT na prática)
-
-- Para garantir que seu ambiente com PostgreSQL e Knex esteja configurado corretamente, e para trabalhar bem com migrations e seeds, recomendo:
-
-  https://www.youtube.com/watch?v=uEABDBQV-Ek&t=1s (Configuração com Docker e Knex)
+**Solução:**  
+Padronize para `"solucionado"` em todos os lugares, ou `"fechado"` em todos os lugares. Recomendo usar `"solucionado"` para manter coerência com a migration.
 
 ---
 
-## 📋 Resumo dos Principais Pontos para Melhorar
+### 5. Falta de endpoint `/usuarios/me`
 
-- ⚠️ Ajustar a **estrutura de diretórios e arquivos** para seguir o padrão solicitado, incluindo rotas e controllers para logout e exclusão de usuários.
+O desafio pede um endpoint bônus `/usuarios/me` que retorna os dados do usuário autenticado. Esse endpoint não está implementado ainda.
 
-- ⚠️ Implementar validação **estrita** para rejeitar campos extras no cadastro de usuários.
+**Solução:**  
+Implemente no `authController.js`:
 
-- ⚠️ Corrigir os status codes para erros de autenticação (usar 401 para credenciais inválidas) e para parâmetros inválidos (usar 400 em vez de 404).
+```js
+async function getMe(req, res) {
+  const userId = req.user.id;
+  const usuario = await usuariosRepository.findById(userId);
+  if (!usuario) {
+    throw new AppError(404, "Usuário não encontrado");
+  }
+  delete usuario.senha;
+  res.status(200).json(usuario);
+}
+```
 
-- ⚠️ Uniformizar os enums de status entre migrations, validações e documentação Swagger.
+E adicione a rota no `authRoutes.js`:
 
-- ⚠️ Implementar os endpoints faltantes: logout e exclusão de usuários.
-
-- ⚠️ Revisar mensagens de erro para não expor informações sensíveis (ex: se o email está cadastrado).
+```js
+router.get("/usuarios/me", authenticateToken, authController.getMe);
+```
 
 ---
 
-## Finalizando 🚀
+### 6. Documentação incompleta no `INSTRUCTIONS.md`
 
-Matheus, seu projeto já está muito bem encaminhado e você mostrou domínio em várias áreas importantes, como segurança e organização de código. Com alguns ajustes pontuais, você vai destravar a totalidade da aplicação e garantir uma API robusta e profissional.
+Seu arquivo `INSTRUCTIONS.md` está muito básico, só com instruções para rodar Docker, migrations e seeds. O desafio pede que você documente:
 
-Continue firme, revise os pontos que destaquei e não hesite em usar os recursos que indiquei para alavancar seu conhecimento. Estou aqui para ajudar sempre que precisar!
+- Como registrar e logar usuários (exemplo de payload e resposta)  
+- Como enviar o token JWT no header Authorization  
+- Fluxo de autenticação esperado  
 
-Bora deixar essa API tinindo! 💪✨
+Isso ajuda quem for usar a API a entender como autenticar e proteger as rotas.
 
-Abraço e até a próxima! 👊😄
+---
+
+### 7. Penalidade: Estrutura de arquivos está quase correta, mas há arquivos extras
+
+Vi que você tem arquivos como `README copy.md` e `relatorio.md` na raiz, que não fazem parte da estrutura esperada. Embora não sejam prejudiciais para o funcionamento, o desafio pediu para seguir a estrutura à risca para evitar penalidades.
+
+**Dica:** Mantenha seu repositório limpo, só com os arquivos necessários.
+
+---
+
+## Recursos para você aprofundar e corrigir os pontos acima 📚
+
+- Para organizar seu projeto e entender arquitetura MVC em Node.js:  
+  https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s
+
+- Para entender autenticação JWT na prática e middleware de proteção:  
+  https://www.youtube.com/watch?v=keS0JWOypIU  
+  https://www.youtube.com/watch?v=L04Ln97AwoY
+
+- Para validar IDs e parâmetros de rotas no Express.js:  
+  (Procure por validação com `zod` ou `express-validator`, que pode ser um próximo passo para seu projeto.)
+
+- Para formatar datas e manipular retornos do banco corretamente:  
+  (Revisite seu código de repositórios e teste com dados reais para garantir formatos corretos.)
+
+---
+
+## Resumo Rápido dos Pontos para Focar 🔥
+
+- [ ] Adicione as rotas de logout e exclusão de usuários no `authRoutes.js` e proteja com middleware.  
+- [ ] Valide os parâmetros de ID para agentes e casos, retornando erro 400 para IDs inválidos.  
+- [ ] Corrija o retorno da data `dataDeIncorporacao` no `agentesRepository` para formatar a data retornada do banco.  
+- [ ] Padronize o enum `status` de casos para `"solucionado"` em toda a aplicação.  
+- [ ] Implemente o endpoint `/usuarios/me` para retornar dados do usuário autenticado.  
+- [ ] Melhore a documentação no `INSTRUCTIONS.md` para incluir fluxo de autenticação e exemplos de uso.  
+- [ ] Limpe arquivos extras do repositório para evitar penalidades por estrutura incorreta.
+
+---
+
+Matheus, você está muito perto de entregar uma aplicação robusta e segura! 🚀 Continue focando nesses detalhes, especialmente na validação de dados e na documentação, que são cruciais para APIs profissionais.  
+
+Se precisar, volte aos vídeos recomendados para reforçar os conceitos de autenticação e arquitetura. A prática constante vai te deixar cada vez mais confiante! 💪
+
+Conte comigo para o que precisar! Vamos juntos nessa jornada! ✨
+
+Um abraço! 🤗👨‍💻
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
