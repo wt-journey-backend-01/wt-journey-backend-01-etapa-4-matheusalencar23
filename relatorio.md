@@ -2,14 +2,16 @@
 
 # 🧪 Relatório de Avaliação – Journey Levty Etapa 1 - matheusalencar23
 
-**Data:** 21/08/2025 21:22
+**Data:** 21/08/2025 21:25
 
-**Nota Final:** `45.45/100`
+**Nota Final:** `42.45/100`
 **Status:** ❌ Reprovado
 
 ---
 ## ✅ Requisitos Obrigatórios
-- Foram encontrados `35` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
+- Foram encontrados `37` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
+  - ⚠️ **Falhou no teste**: `USERS: Recebe erro 400 ao tentar criar um usuário com e-mail já em uso`
+    - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
   - ⚠️ **Falhou no teste**: `AGENTS: Cria agentes corretamente com status code 201 e os dados inalterados do agente mais seu ID`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
   - ⚠️ **Falhou no teste**: `AGENTS: Lista todos os agente corretamente com status code 200 e todos os dados de cada agente listados corretamente`
@@ -71,6 +73,8 @@
   - ⚠️ **Falhou no teste**: `CASES: Recebe status code 404 ao tentar atualizar um caso por completo com método PUT de um caso inexistente`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
   - ⚠️ **Falhou no teste**: `CASES: Recebe status code 404 ao tentar atualizar um caso por completo com método PUT de um caso com ID inválido`
+    - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
+  - ⚠️ **Falhou no teste**: `CASES: Recebe status code 401 ao tentar criar caso sem header de autorização com JWT`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
   - ⚠️ **Falhou no teste**: `CASES: Recebe status code 404 ao tentar atualizar um caso parcialmente com método PATCH de um caso inexistente`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
