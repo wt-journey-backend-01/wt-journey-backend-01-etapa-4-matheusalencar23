@@ -2,7 +2,7 @@ const z = require("zod");
 const { validate } = require("./errorHandler");
 
 const newUserValidation = (req, res, next) => {
-  const newUser = z.object({
+  const newUser = z.strictObject({
     nome: z.string().min(1, "Nome é obrigatório"),
     email: z.email("Email inválido"),
     senha: z
