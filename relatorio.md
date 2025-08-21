@@ -1,244 +1,244 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 9 créditos restantes para usar o sistema de feedback AI.
+Você tem 8 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para matheusalencar23:
 
-Nota final: **60.5/100**
+Nota final: **45.3/100**
 
-# Feedback para matheusalencar23 🚔✨
+# Feedback para matheusalencar23 🚓🚀
 
-Olá, Matheus! Primeiro, parabéns pelo esforço e pelo progresso que você já fez nessa etapa tão importante de segurança e autenticação! 🎉 Você implementou várias funcionalidades essenciais, como o cadastro e login de usuários com hash de senhas e JWT, além da estruturação das rotas e controllers seguindo o padrão MVC. Isso já é um grande avanço para uma API profissional e segura.
-
----
-
-## 🎯 Pontos Positivos — O que você mandou muito bem!
-
-- **Cadastro de usuários com hash de senha:** Você usou o bcrypt para hashear as senhas antes de salvar, o que é a prática correta para segurança.
-- **Login com JWT:** Você gera o token JWT com as informações do usuário e um tempo de expiração, o que é ótimo para manter sessões seguras.
-- **Estruturação do projeto:** Separou controllers, repositories, rotas e utils, o que facilita a manutenção e escalabilidade.
-- **Endpoints de agentes e casos funcionando:** As operações CRUD para agentes e casos estão bem implementadas e com tratamento de erros personalizado, o que melhora a experiência da API.
-- **Bônus conquistado:** Você implementou a filtragem simples de casos por status e por agente, o que já mostra que está indo além do básico. Parabéns por esse esforço extra! 🌟
+Olá, Matheus! Primeiro, quero parabenizá-lo pelo esforço e pelo código que você entregou até aqui. 🎉 Você já avançou muito na implementação de uma API REST segura, com autenticação JWT, hashing de senhas e organização do código em camadas. Isso não é trivial e mostra que você está no caminho certo para se tornar um desenvolvedor Node.js profissional!
 
 ---
 
-## 🔍 O que precisa de atenção — Vamos destrinchar os pontos que travaram seu progresso
+## 🎯 Pontos Fortes e Conquistas Bônus
 
-### 1. **Falta do middleware de autenticação e proteção das rotas**
+- Seu **controle de autenticação** está bem estruturado, com uso correto do bcrypt para hash da senha e JWT para geração do token, como vi no `authController.js`:
 
-Ao analisar seu código, percebi que você não implementou o arquivo `middlewares/authMiddleware.js`, e também não aplicou o middleware para proteger as rotas de `/agentes` e `/casos`. Isso é fundamental para garantir que apenas usuários autenticados possam acessar esses recursos.
+  ```js
+  const token = jwt.sign(
+    {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+    },
+    SECRET,
+    { expiresIn: "1d" }
+  );
+  ```
 
-No seu `server.js`, você faz:
+- O middleware de autenticação (`authMiddleware.js`) está implementado de forma adequada, verificando o token no header e tratando erros de forma clara.
 
-```js
-app.use(casosRouter);
-app.use(agentesRouter);
-app.use(authRouter);
-```
+- Você aplicou o middleware de autenticação nas rotas de agentes e casos no `server.js`:
 
-Mas não há nenhuma aplicação de middleware de autenticação para proteger as rotas sensíveis. O correto seria algo assim:
+  ```js
+  app.use(authenticateToken, casosRouter);
+  app.use(authenticateToken, agentesRouter);
+  ```
 
-```js
-const authMiddleware = require("./middlewares/authMiddleware");
+- A validação das senhas está bastante completa, cobrindo os requisitos de tamanho, caracteres especiais, letras maiúsculas e minúsculas, o que é essencial para segurança.
 
-app.use("/agentes", authMiddleware, agentesRouter);
-app.use("/casos", authMiddleware, casosRouter);
-app.use(authRouter);
-```
+- Você também implementou endpoints adicionais que são bônus, como a filtragem de casos por status, busca de agente responsável por caso, e o endpoint `/usuarios/me` para retornar dados do usuário autenticado.
 
-E o middleware `authMiddleware.js` deve:
+---
 
-- Extrair o token do header `Authorization: Bearer <token>`
-- Validar o token JWT usando o segredo do `.env`
-- Adicionar os dados do usuário autenticado no `req.user`
-- Retornar erro 401 se o token for inválido ou ausente
+## 🔍 O que precisa de atenção e melhorias
+
+### 1. Estrutura de Diretórios e Arquivos
+
+Ao analisar o seu projeto, percebi que a estrutura de arquivos não está exatamente alinhada com o que foi solicitado. Por exemplo, o arquivo `authRoutes.js` está presente, mas não vi um arquivo para logout (`POST /auth/logout`) nem a rota para exclusão de usuários (`DELETE /users/:id`) implementados, que são requisitos importantes.
+
+Além disso, a mensagem de penalidade indica que houve problemas com arquivos estáticos ou estrutura que não deveriam estar presentes.
 
 **Por que isso é importante?**  
-Sem essa proteção, qualquer pessoa pode acessar, criar, atualizar ou deletar agentes e casos, o que quebra totalmente a segurança da aplicação. É por isso que você está recebendo erros 401 em várias operações sem o header de autorização.
+Manter a estrutura conforme o padrão ajuda não só a organização, mas também a facilitar testes, manutenção e escalabilidade do projeto. Além disso, o avaliador (e futuros colegas devs) esperam encontrar os arquivos e funcionalidades exatamente onde deveriam estar.
+
+**Dica:**  
+Confira se suas pastas e arquivos seguem exatamente este padrão:
+
+```
+📦 SEU-REPOSITÓRIO
+│
+├── package.json
+├── server.js
+├── .env
+├── knexfile.js
+├── INSTRUCTIONS.md
+│
+├── db/
+│ ├── migrations/
+│ ├── seeds/
+│ └── db.js
+│
+├── routes/
+│ ├── agentesRoutes.js
+│ ├── casosRoutes.js
+│ └── authRoutes.js
+│
+├── controllers/
+│ ├── agentesController.js
+│ ├── casosController.js
+│ └── authController.js
+│
+├── repositories/
+│ ├── agentesRepository.js
+│ ├── casosRepository.js
+│ └── usuariosRepository.js
+│
+├── middlewares/
+│ └── authMiddleware.js
+│
+├── utils/
+│ └── errorHandler.js
+```
 
 ---
 
-### 2. **Validação dos dados dos usuários no cadastro**
+### 2. Validação Rigorosa dos Dados e Campos Extras
 
-Você está tratando erros quando o email já existe, mas não vi nenhuma validação para garantir que os campos `nome`, `email` e `senha` estejam presentes e com os requisitos mínimos. Por exemplo, seu código não impede que um usuário seja criado com nome vazio, email vazio, senha muito curta, ou senha sem os critérios de complexidade (número, letra maiúscula, caractere especial).
+Um dos testes falhou porque o sistema não retorna erro 400 ao tentar criar um usuário com campos extras. Isso indica que no seu `newUserValidation` (possivelmente em `utils/userValidations.js`) está faltando uma validação para rejeitar propriedades que não deveriam estar no payload.
 
-Veja seu trecho do `authController.js`:
+**Por que isso acontece?**  
+Quando você aceita campos extras no corpo da requisição, isso pode gerar inconsistências no banco de dados e vulnerabilidades. Por isso, é importante que a validação de entrada seja estrita, aceitando apenas os campos esperados.
 
-```js
-async function signUp(req, res) {
-  const { nome, email, senha } = req.body;
-
-  const usuario = await usuariosRepository.findByEmail(email);
-
-  if (usuario) {
-    throw new AppError(
-      400,
-      "Já existe um usuário cadastrado com o email especificado"
-    );
-  }
-
-  const salt = await bcrypt.genSalt(parseInt(process.env.SALT_ROUNDS) || 10);
-  const hash = await bcrypt.hash(senha, salt);
-
-  const novoUsuario = await usuariosRepository.create({
-    nome,
-    email,
-    senha: hash,
-  });
-
-  delete novoUsuario.senha;
-  res.status(201).json(novoUsuario);
-}
-```
-
-**Aqui falta validação explícita dos campos antes de tentar criar o usuário.**
-
-Você pode usar uma biblioteca como [Zod](https://github.com/colinhacks/zod) (que já está nas suas dependências) para validar o formato e os requisitos da senha e dos campos. Exemplo simples:
+**Como corrigir?**  
+Se você estiver usando uma biblioteca como o Zod para validação, pode usar o método `.strict()` para rejeitar campos extras. Por exemplo:
 
 ```js
-const { z } = require("zod");
-
 const userSchema = z.object({
-  nome: z.string().min(1, "Nome é obrigatório"),
-  email: z.string().email("Email inválido"),
-  senha: z.string()
-    .min(8, "Senha deve ter ao menos 8 caracteres")
-    .regex(/[a-z]/, "Senha deve conter letra minúscula")
-    .regex(/[A-Z]/, "Senha deve conter letra maiúscula")
-    .regex(/[0-9]/, "Senha deve conter número")
-    .regex(/[\W_]/, "Senha deve conter caractere especial"),
-});
+  nome: z.string().min(1),
+  email: z.string().email(),
+  senha: z.string().min(8).regex(...), // regex para senha forte
+}).strict();
+```
 
-async function signUp(req, res) {
-  try {
-    userSchema.parse(req.body);
-  } catch (error) {
-    throw new AppError(400, "Parâmetros inválidos", error.errors.map(e => e.message));
-  }
-  // restante do código...
+Assim, qualquer campo fora desses três será rejeitado com erro 400.
+
+---
+
+### 3. Status Codes e Mensagens Consistentes
+
+Vi que no seu `authController.js`, você retorna erro 404 quando o usuário não é encontrado no login:
+
+```js
+if (!usuario) {
+  throw new AppError(
+    404,
+    "Nenhum usuário encontrado para o email especificado"
+  );
 }
 ```
 
-Assim, você garante que o usuário só será criado se todos os requisitos forem cumpridos.
+Porém, no contexto de autenticação, o status correto para credenciais inválidas (incluindo usuário não encontrado) é **401 Unauthorized**. Isso evita expor se o email está cadastrado ou não, melhorando a segurança.
 
----
-
-### 3. **Tabela de usuários no banco: campo email não está único**
-
-Na sua migration `20250801194155_solution_migrations.js`, a tabela `usuarios` é criada assim:
+**Sugestão:**
 
 ```js
-await knex.schema.createTable("usuarios", function (table) {
-  table.increments("id").primary();
-  table.string("nome").notNullable();
-  table.string("email").notNullable();
-  table.string("senha").notNullable();
-});
-```
-
-Mas o campo `email` precisa ser único para evitar duplicidade, conforme requisito do projeto. A correção é adicionar `.unique()`:
-
-```js
-table.string("email").notNullable().unique();
-```
-
-Isso evita que o banco aceite dois usuários com o mesmo email, reforçando a integridade dos dados.
-
----
-
-### 4. **Resposta do login: token deve estar dentro de um objeto com a chave `acess_token`**
-
-No seu `authController.js`, você envia o token assim:
-
-```js
-res.status(200).json(token);
-```
-
-Mas o requisito pede que retorne um objeto com a propriedade `acess_token` (note a grafia do requisito):
-
-```json
-{
-  "acess_token": "token aqui"
+if (!usuario) {
+  throw new AppError(401, "Credenciais inválidas");
 }
 ```
 
-Então o correto seria:
+E mantenha a mesma mensagem para senha inválida, para não dar pistas ao atacante.
+
+---
+
+### 4. Validação de IDs e Tratamento de Erros
+
+Notei que em alguns controllers, como `casosController.js`, você faz validação do ID:
 
 ```js
-res.status(200).json({ acess_token: token });
+const id = Number(req.params.id);
+if (!id || !Number.isInteger(id)) {
+  throw new AppError(404, "Id inválido");
+}
 ```
 
-Isso é importante para o frontend ou clientes da API saberem onde encontrar o token e para os testes funcionarem corretamente.
+Aqui, o status 404 não é o mais adequado para parâmetro inválido; o correto é **400 Bad Request**, pois o recurso não foi encontrado por causa de um parâmetro mal formatado, não porque o recurso não existe.
+
+**Melhore assim:**
+
+```js
+if (!id || !Number.isInteger(id)) {
+  throw new AppError(400, "Id inválido");
+}
+```
+
+Esse cuidado ajuda o cliente da API a entender se o erro é de sintaxe/entrada ou de recurso inexistente.
 
 ---
 
-### 5. **Endpoint `/usuarios/me` não implementado**
+### 5. Enum e Documentação Swagger
 
-Você não implementou o endpoint que retorna os dados do usuário autenticado (`GET /usuarios/me`), que é um bônus importante para mostrar que o usuário está autenticado e para exibir informações pessoais.
+No seu `casosRoutes.js`, vi que o enum para status está definido assim:
 
-Esse endpoint deve usar o middleware de autenticação para garantir que o usuário está logado, e retornar os dados do usuário (sem a senha).
+```yaml
+status:
+  type: string
+  enum: ["aberto", "fechado"]
+  example: "aberto"
+```
 
----
+Mas na migration você criou o enum como `["aberto", "solucionado"]`. Essa inconsistência pode gerar confusão para quem consome a API e para o banco.
 
-### 6. **Documentação incompleta no INSTRUCTIONS.md**
-
-Seu arquivo `INSTRUCTIONS.md` está básico e não inclui instruções sobre:
-
-- Como registrar e logar usuários (exemplo de payload e resposta)
-- Como enviar o token JWT no header `Authorization` para acessar rotas protegidas
-- O fluxo esperado de autenticação (login → receber token → usar token nas rotas)
-
-Documentar isso é fundamental para qualquer pessoa que for usar sua API entender como autenticar e proteger as requisições.
+**Corrija para que os enums estejam iguais em todos os lugares.**
 
 ---
 
-### 7. **Penalidade: Estrutura de diretórios incompleta**
+### 6. Logout e Exclusão de Usuários
 
-Na estrutura do seu projeto, não encontrei a pasta `middlewares` nem o arquivo `authMiddleware.js`, que é obrigatório.
+Percebi que você implementou os endpoints de registro e login, mas não vi o endpoint de logout (`POST /auth/logout`) nem o de exclusão de usuários (`DELETE /users/:id`).
 
-Além disso, a organização dos arquivos está boa, mas essa falta quebra a arquitetura esperada do projeto e impacta diretamente a segurança da aplicação.
-
----
-
-## 💡 Recomendações de aprendizado para você brilhar ainda mais!
-
-- Sobre **middleware de autenticação com JWT** e proteção de rotas, recomendo fortemente este vídeo, feito pelos meus criadores, que explica os conceitos básicos e fundamentais da cibersegurança:  
-  https://www.youtube.com/watch?v=Q4LQOfYwujk
-
-- Para entender o uso prático do JWT e como validar tokens, este vídeo é excelente:  
-  https://www.youtube.com/watch?v=keS0JWOypIU
-
-- Para combinar JWT com bcrypt (hash de senha) e garantir uma autenticação segura, assista este tutorial:  
-  https://www.youtube.com/watch?v=L04Ln97AwoY
-
-- Para aprender a validar dados usando a biblioteca Zod, que vai te ajudar a garantir a qualidade dos dados de entrada:  
-  https://www.npmjs.com/package/zod (documentação oficial)
-
-- Para estruturar seu projeto seguindo o padrão MVC e entender a importância da organização, veja este vídeo:  
-  https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s
-
-- Caso tenha dúvidas na configuração do banco com Docker e Knex, este vídeo explica passo a passo:  
-  https://www.youtube.com/watch?v=uEABDBQV-Ek&t=1s
+Esses são requisitos importantes para o desafio e devem ser implementados para completar a segurança e o ciclo de vida do usuário.
 
 ---
 
-## ✨ Resumo rápido dos principais pontos para você focar:
+## 💡 Recomendações de Estudo e Recursos
 
-- [ ] Implemente o middleware de autenticação JWT (`authMiddleware.js`) e proteja as rotas de `/agentes` e `/casos`.
-- [ ] Adicione validações rigorosas para os dados de usuários no cadastro (nome, email, senha com regras de complexidade).
-- [ ] Ajuste a migration para tornar o campo `email` da tabela `usuarios` único.
-- [ ] Corrija a resposta do login para retornar `{ acess_token: token }` em JSON.
-- [ ] Implemente o endpoint `/usuarios/me` para retornar dados do usuário autenticado.
-- [ ] Melhore a documentação no `INSTRUCTIONS.md` para incluir exemplos de registro, login e uso do token JWT.
-- [ ] Organize a estrutura do projeto para incluir a pasta `middlewares` e o arquivo `authMiddleware.js` conforme o padrão esperado.
+- Para melhorar a validação dos dados e evitar campos extras, recomendo fortemente estudar o uso do Zod com `.strict()`:
+
+  https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s (Refatoração e Boas Práticas de Código)
+
+- Para entender melhor o fluxo correto de autenticação, status codes e segurança com JWT e bcrypt, assista este vídeo, feito pelos meus criadores, que explica os conceitos básicos e fundamentais da cibersegurança:
+
+  https://www.youtube.com/watch?v=Q4LQOfYwujk (Video sobre autenticação)
+
+- Para aprofundar no uso prático de JWT em Node.js, veja:
+
+  https://www.youtube.com/watch?v=keS0JWOypIU (JWT na prática)
+
+- Para garantir que seu ambiente com PostgreSQL e Knex esteja configurado corretamente, e para trabalhar bem com migrations e seeds, recomendo:
+
+  https://www.youtube.com/watch?v=uEABDBQV-Ek&t=1s (Configuração com Docker e Knex)
 
 ---
 
-Matheus, você está no caminho certo, parabéns pelo que já conquistou! 🚀 Agora, com essas melhorias, sua API vai ficar muito mais segura, profissional e pronta para o uso real. Continue firme que você vai dominar esses conceitos fundamentais de autenticação e segurança backend! Se precisar, volte a esses vídeos e documentação para reforçar os conceitos.
+## 📋 Resumo dos Principais Pontos para Melhorar
 
-Qualquer dúvida, estou aqui para ajudar! 💪😄
+- ⚠️ Ajustar a **estrutura de diretórios e arquivos** para seguir o padrão solicitado, incluindo rotas e controllers para logout e exclusão de usuários.
 
-Abraços e bons códigos! 👨‍💻✨
+- ⚠️ Implementar validação **estrita** para rejeitar campos extras no cadastro de usuários.
+
+- ⚠️ Corrigir os status codes para erros de autenticação (usar 401 para credenciais inválidas) e para parâmetros inválidos (usar 400 em vez de 404).
+
+- ⚠️ Uniformizar os enums de status entre migrations, validações e documentação Swagger.
+
+- ⚠️ Implementar os endpoints faltantes: logout e exclusão de usuários.
+
+- ⚠️ Revisar mensagens de erro para não expor informações sensíveis (ex: se o email está cadastrado).
+
+---
+
+## Finalizando 🚀
+
+Matheus, seu projeto já está muito bem encaminhado e você mostrou domínio em várias áreas importantes, como segurança e organização de código. Com alguns ajustes pontuais, você vai destravar a totalidade da aplicação e garantir uma API robusta e profissional.
+
+Continue firme, revise os pontos que destaquei e não hesite em usar os recursos que indiquei para alavancar seu conhecimento. Estou aqui para ajudar sempre que precisar!
+
+Bora deixar essa API tinindo! 💪✨
+
+Abraço e até a próxima! 👊😄
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
