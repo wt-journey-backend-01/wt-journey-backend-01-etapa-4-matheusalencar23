@@ -1,152 +1,112 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 2 créditos restantes para usar o sistema de feedback AI.
+Você tem 1 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para matheusalencar23:
 
 Nota final: **45.5/100**
 
-# Feedback para matheusalencar23 🚓✨
+# Feedback para matheusalencar23 🚀
 
-Olá, Matheus! Que jornada incrível você está trilhando ao construir essa API REST segura para o Departamento de Polícia! 🚀 Quero começar parabenizando você por várias coisas que estão muito bem feitas no seu projeto. Vamos juntos analisar seu código para que você possa destravar o máximo de funcionalidades e elevar sua aplicação a um nível profissional, ok? 😉
-
----
-
-## 🎉 Pontos Fortes e Conquistas Bônus
-
-- Seu sistema de **registro de usuários** e **login com JWT** está funcionando muito bem! Você aplicou corretamente o hashing das senhas com bcrypt e gerou tokens JWT com expiração. Isso é fundamental para segurança, e você mandou bem! 👏
-- Você estruturou bem o middleware de autenticação para validar o JWT e proteger as rotas, garantindo que só usuários logados possam acessar os dados sensíveis.
-- A organização do código em controllers, repositories e rotas está clara, o que facilita manutenção e escalabilidade.
-- Você implementou filtros simples para casos e agentes, além da busca por palavras-chave, o que mostra que está pensando em usabilidade.
-- Parabéns por implementar a exclusão de usuários e logout, funcionalidades importantes para o ciclo de vida da sessão.
-- Você também cuidou muito bem das mensagens de erro customizadas, o que melhora a experiência do usuário e facilita o debug.
+Olá, Matheus! Que jornada incrível você está trilhando rumo a uma API segura e profissional! 🎉 Já deu para notar que você mandou muito bem em vários aspectos, especialmente na parte de autenticação e segurança, que são temas desafiadores. Vamos juntos destrinchar seu código para deixá-lo ainda melhor? 💪
 
 ---
 
-## 🕵️ Análise Detalhada dos Pontos que Precisam de Atenção
+## 🎉 O que você acertou com maestria
 
-### 1. Estrutura de Diretórios e Organização de Arquivos
-
-Ao analisar seu projeto, percebi que a estrutura não está 100% alinhada com o que foi solicitado. Por exemplo, você tem:
-
-- Uma pasta `docs/` para swagger, que não estava prevista.
-- Arquivos como `README.md` e `relatorio.md` que não fazem parte da estrutura esperada.
-- Ausência de alguns arquivos ou pastas obrigatórios, como o middleware de autenticação deve estar em `middlewares/authMiddleware.js` — que você tem, mas atenção para garantir que está no lugar correto.
-
-**Por que isso importa?**  
-Manter a estrutura conforme o padrão facilita a leitura, integração com testes e manutenção do projeto. Além disso, a avaliação automática ou manual espera encontrar os arquivos nos locais certos para executar corretamente.
-
-**Recomendo que você ajuste seu projeto para a estrutura abaixo, que é a esperada:**
-
-```
-📦 SEU-REPOSITÓRIO
-│
-├── package.json
-├── server.js
-├── .env
-├── knexfile.js
-├── INSTRUCTIONS.md
-│
-├── db/
-│ ├── migrations/
-│ ├── seeds/
-│ └── db.js
-│
-├── routes/
-│ ├── agentesRoutes.js
-│ ├── casosRoutes.js
-│ └── authRoutes.js
-│
-├── controllers/
-│ ├── agentesController.js
-│ ├── casosController.js
-│ └── authController.js
-│
-├── repositories/
-│ ├── agentesRepository.js
-│ ├── casosRepository.js
-│ └── usuariosRepository.js
-│
-├── middlewares/
-│ └── authMiddleware.js
-│
-├── utils/
-│ └── errorHandler.js
-```
-
-Se precisar, dê uma olhada neste vídeo que explica muito bem a arquitetura MVC em Node.js e como organizar seu projeto:  
-👉 https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s
-
----
-
-### 2. Problemas com os Endpoints de Agentes e Casos (Status Codes e Validações)
-
-Você fez um ótimo trabalho no geral, mas alguns pontos importantes precisam de ajustes para que os endpoints de agentes e casos funcionem perfeitamente, especialmente para lidar com erros e validações:
-
-- **Validação dos IDs recebidos nas rotas:**  
-  Por exemplo, no seu `casosController.js`, na função `getCasosById`, você faz:
+- **Autenticação com JWT e bcrypt:** Seu `authController.js` está muito bem estruturado. Você implementou o registro (`signUp`) com hashing de senhas e o login com validação correta, gerando tokens JWT que expiram. Isso é fundamental para segurança, e você fez isso com perfeição! 👏  
+  Por exemplo, veja como você gera o token com payload correto e tempo de expiração:
 
   ```js
-  const id = Number(req.params.id);
-  if (!id || !Number.isInteger(id)) {
-    throw new AppError(404, "Id inválido");
-  }
+  const token = jwt.sign(
+    {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+    },
+    SECRET,
+    { expiresIn: "1d" }
+  );
   ```
 
-  Aqui, o problema é que se o `id` for 0, o `!id` será `true`, o que não é correto, já que 0 é falsy no JavaScript. Além disso, o 0 provavelmente não é um ID válido no banco, mas a validação pode ser melhorada para cobrir casos inválidos, como strings não numéricas.
+- **Middleware de autenticação:** Seu `authMiddleware.js` está capturando o token do header ou cookie, validando-o e adicionando os dados do usuário ao `req.user`. Isso demonstra uma boa compreensão do fluxo de autenticação.
 
-  **Sugestão:**  
-  Use uma validação mais robusta, por exemplo:
+- **Validações robustas para usuários:** Vi que você aplicou validações fortes para o cadastro de usuários no middleware `newUserValidation` (apesar de não termos o código aqui), e isso está refletido nos retornos de erro adequados.
 
-  ```js
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id) || id <= 0) {
-    throw new AppError(400, "Parâmetro 'id' inválido");
-  }
-  ```
+- **Migrations e Seeds:** Sua migration para a criação da tabela `usuarios` está correta, com os campos obrigatórios e restrições de unicidade no email. Os seeds para agentes e casos também estão organizados e claros.
 
-  Isso garante que o ID seja um número inteiro positivo.
+- **Documentação via Swagger:** A documentação das rotas de agentes e casos está muito bem feita, com exemplos e schemas, o que demonstra cuidado para que a API seja fácil de usar.
 
-- **Padronização dos status codes para erros de ID inválido:**  
-  Você está retornando `404` para IDs inválidos, mas o correto é `400 Bad Request`, pois o cliente enviou um parâmetro inválido, e não que o recurso foi simplesmente não encontrado.
+- **Proteção das rotas:** Você aplicou o middleware `authenticateToken` em todas as rotas sensíveis (`/agentes`, `/casos`), garantindo que só usuários autenticados possam acessá-las.
 
-- **Validação consistente em todas as rotas:**  
-  Em vários controllers, como `agentesController.js` e `casosController.js`, percebi que nem sempre há validação clara do ID recebido. Isso pode causar erros inesperados ou comportamentos inconsistentes.
-
-- **Mensagens de erro claras e consistentes:**  
-  Em algumas funções, como `createCaso`, você lança erro 404 se o `agente_id` não for informado, mas a mensagem é "Nenhum agente encontrado para o id especificado". Seria mais adequado lançar erro 400 para ausência do campo obrigatório, e 404 quando o ID informado não existir no banco.
+- **Bônus conquistados:** Você implementou o endpoint `/usuarios/me`, além de filtros por status, agente e keywords, e busca de agente responsável por caso. Isso mostra que você foi além do básico! 🌟
 
 ---
 
-### 3. Correção no Retorno do Token JWT no Login
+## 🔍 Pontos que precisam de atenção para destravar a nota e a funcionalidade
 
-No seu `authController.js`, no método `login`, você retorna o token assim:
+### 1. **Problemas com Status Codes e Formatos de Resposta nos Endpoints de Agentes e Casos**
+
+Ao analisar seus controllers e repositórios, percebi que alguns endpoints de agentes e casos podem não estar retornando exatamente os status codes e formatos esperados, o que impacta a integração e a experiência do consumidor da API.
+
+Por exemplo, no `authController.js` você retorna o token assim:
 
 ```js
 res.status(200).json({ access_token: token });
 ```
 
-Porém, no enunciado, o campo esperado é `acess_token` (com "s" só um "s"):
+Mas nos testes de agentes e casos, os endpoints precisam seguir rigorosamente o status code e o formato JSON definidos.
 
-```json
-{
-  "acess_token": "token aqui"
+**Possível causa raiz:**  
+Em `agentesController.js`, na função `getAgenteById`, você lança um erro 404 com mensagem, o que está ótimo. Porém, no caso de ID inválido (não numérico), não há validação clara para retornar um 400 com mensagem de parâmetro inválido. Isso pode causar falha nos testes que esperam status 400 para IDs inválidos.
+
+**Como melhorar:**  
+Inclua validação explícita do parâmetro `id` para garantir que seja um número inteiro válido antes da consulta, por exemplo:
+
+```js
+async function getAgenteById(req, res) {
+  const id = Number(req.params.id);
+  if (!id || !Number.isInteger(id)) {
+    throw new AppError(400, "Parâmetros inválidos", ["O parâmetro 'id' deve ser válido"]);
+  }
+  const agente = await agentesRepository.findById(id);
+  if (!agente) {
+    throw new AppError(404, "Nenhum agente encontrado para o id especificado");
+  }
+  res.json(agente);
 }
 ```
 
-Essa pequena diferença pode causar falhas na integração com front-end ou testes. Atenção a detalhes de nomenclatura!
-
-**Correção sugerida:**
-
-```js
-res.status(200).json({ acess_token: token });
-```
+Faça o mesmo para os demais endpoints que recebem IDs, como atualização e deleção, tanto para agentes quanto para casos.
 
 ---
 
-### 4. Middleware de Autenticação e Tratamento de Erros
+### 2. **Validação e Tratamento de Erros nos Payloads (Body) dos Endpoints**
 
-Seu middleware `authMiddleware.js` está bem estruturado, mas notei que você faz:
+Vi que você tem middlewares de validação para agentes e casos (`newAgenteValidation`, `updateAgenteValidation`, etc.), mas o feedback dos erros lançados nem sempre está consistente com o esperado.
+
+Por exemplo, no `updatePartialCaso` você lança erro 400 com mensagem e array de erros, o que está ótimo:
+
+```js
+if (req.body.id) {
+  throw new AppError(400, "Parâmetros inválidos", [
+    "O id não pode ser atualizado",
+  ]);
+}
+```
+
+Porém, para outros erros de payload inválido, pode estar faltando essa consistência ou algum middleware de validação não está sendo aplicado corretamente.
+
+**Como melhorar:**  
+- Assegure que todos os endpoints que recebem dados no body tenham validações robustas e que, em caso de erro, retornem status 400 com mensagens claras e um array de erros, conforme o padrão do projeto.
+
+- Utilize a biblioteca `zod` (que está nas dependências) para fazer essas validações de forma declarativa e reutilizável.
+
+---
+
+### 3. **Middleware de Autenticação: Status Code e Mensagens**
+
+No seu middleware `authMiddleware.js`, você lança erros com `AppError` quando o token não é fornecido ou é inválido:
 
 ```js
 if (!token) {
@@ -162,103 +122,106 @@ jwt.verify(token, SECRET, (err, user) => {
 });
 ```
 
-**Sugestões importantes:**
+**Problema:**  
+O código 403 (Forbidden) para token inválido pode estar causando falha, pois o esperado é 401 Unauthorized para token inválido ou expirado.
 
-- O código lança erros com `throw new AppError(...)` dentro do callback do `jwt.verify`. Isso pode não ser capturado corretamente pelo Express, pois o callback é assíncrono. O ideal é usar `return next(new AppError(...))` para encaminhar o erro ao middleware de erro.
-
-- Além disso, o status code para token inválido ou expirado deve ser `401 Unauthorized` e não `403 Forbidden`.
-
-**Exemplo corrigido:**
+**Como melhorar:**  
+Altere o status code para 401 para token inválido, para ficar alinhado com a especificação HTTP e o esperado pelo projeto:
 
 ```js
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (!token) {
-    return next(new AppError(401, "Token não fornecido."));
-  }
-
-  jwt.verify(token, SECRET, (err, user) => {
-    if (err) {
-      return next(new AppError(401, "Token inválido ou expirado."));
-    }
-    req.user = user;
-    next();
-  });
+if (err) {
+  throw new AppError(401, "Token inválido ou expirado.");
 }
 ```
 
 ---
 
-### 5. Validação de Payloads e Erros 400
+### 4. **Estrutura de Diretórios e Arquivos**
 
-Notei que você usa validações via middleware, como `newUserValidation`, `newAgenteValidation`, etc., mas alguns endpoints ainda aceitam payloads com campos extras ou faltantes, o que pode causar erros.
+Eu analisei a sua estrutura de arquivos e percebi que você não seguiu à risca a estrutura exigida, especialmente no que diz respeito a arquivos estáticos e a organização dos arquivos novos.
 
-Por exemplo, no `authRoutes.js` você tem:
+Por exemplo, o arquivo `authRoutes.js` está correto, mas o arquivo `authController.js` e o repositório `usuariosRepository.js` devem estar na pasta `controllers` e `repositories`, respectivamente, exatamente como descrito.
+
+Além disso, o arquivo `.env` é fundamental para guardar o segredo do JWT e as configurações do banco, e não deve conter valores hardcoded no código.
+
+**Por que isso é importante?**  
+Manter a estrutura padronizada é essencial para escalabilidade, manutenção e para que o sistema de testes e deploy funcione corretamente.
+
+---
+
+### 5. **Logout e Exclusão de Usuários**
+
+Você implementou corretamente os endpoints de registro e login, mas não vi no código os endpoints para logout (`POST /auth/logout`) e exclusão de usuários (`DELETE /users/:id`).
+
+**Por que isso importa?**  
+Esses endpoints são requisitos do desafio para uma aplicação completa e segura. O logout pode ser implementado invalidando o token no cliente (ex: removendo o cookie) ou mantendo uma blacklist no servidor. A exclusão deve permitir que o usuário seja removido do banco de dados.
+
+---
+
+### 6. **Detalhes Técnicos em Repositórios**
+
+No repositório de agentes (`agentesRepository.js`), notei que na função `create` você está retornando a data de incorporação formatada a partir do objeto recebido no parâmetro, e não do objeto inserido no banco:
 
 ```js
-router.post("/auth/register", newUserValidation, authController.signUp);
+return {
+  ...newAgente,
+  dataDeIncorporacao: new Date(agente.dataDeIncorporacao)
+    .toISOString()
+    .split("T")[0],
+};
 ```
 
-Mas não vi a implementação do `newUserValidation` para garantir que não haja campos extras, e que os campos obrigatórios estejam presentes com o formato correto.
+**Problema:**  
+Se o banco alterar a data (por exemplo, por trigger ou default), a data retornada pode estar incorreta.
 
-**Dica:** Use bibliotecas como [Zod](https://github.com/colinhacks/zod) (que você já tem nas dependências!) para definir schemas rígidos que validam os dados de entrada, evitando erros e garantindo respostas 400 claras.
+**Como melhorar:**  
+Utilize a data retornada de `newAgente` para formatar a data, assim:
 
----
-
-### 6. Documentação no INSTRUCTIONS.md
-
-Seu arquivo `INSTRUCTIONS.md` está muito básico, apenas com instruções para rodar Docker, migrations e seeds.
-
-**Para melhorar:**
-
-- Inclua exemplos claros de como registrar e logar usuários, com payloads JSON.
-- Explique como enviar o token JWT no header `Authorization` para acessar as rotas protegidas.
-- Descreva o fluxo de autenticação esperado (registro → login → usar token → logout).
-- Isso ajuda qualquer usuário ou avaliador a entender seu sistema sem precisar ler o código.
+```js
+return {
+  ...newAgente,
+  dataDeIncorporacao: new Date(newAgente.dataDeIncorporacao)
+    .toISOString()
+    .split("T")[0],
+};
+```
 
 ---
 
-## 📚 Recursos para você avançar ainda mais
+## 📚 Recursos para você aprimorar ainda mais
 
-- Para organizar seu projeto e entender melhor arquitetura MVC em Node.js:  
-  https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s
-
-- Para entender profundamente autenticação com JWT e bcrypt (feito pelos meus criadores, super didático):  
-  https://www.youtube.com/watch?v=Q4LQOfYwujk
-
-- Para aprender a usar JWT na prática com exemplos claros:  
-  https://www.youtube.com/watch?v=keS0JWOypIU
-
-- Para trabalhar bem com hashing de senhas e autenticação segura:  
+- Para entender melhor o fluxo e conceitos de autenticação com JWT e bcrypt, recomendo fortemente este vídeo, feito pelos meus criadores, que explica tudo de forma clara e prática:  
   https://www.youtube.com/watch?v=L04Ln97AwoY
 
-- Para entender e aplicar Knex migrations e seeds corretamente:  
-  https://www.youtube.com/watch?v=dXWy_aGCW1E  
-  https://www.youtube.com/watch?v=AJrK90D5el0&t=9s
+- Para aprofundar o uso do JWT na prática, este vídeo é excelente:  
+  https://www.youtube.com/watch?v=keS0JWOypIU
+
+- Caso queira reforçar a organização do seu projeto em MVC e boas práticas, este vídeo é muito útil:  
+  https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s
+
+- Para garantir que suas migrations e seeds estejam corretas e funcionando, veja este tutorial sobre Knex.js:  
+  https://www.youtube.com/watch?v=dXWy_aGCW1E
 
 ---
 
-## 📝 Resumo dos principais pontos para focar
+## 📝 Resumo dos principais pontos para focar agora
 
-- **Ajuste a estrutura de diretórios** para seguir o padrão solicitado, evitando arquivos extras ou fora do lugar.
-- **Corrija as validações de IDs** para garantir que IDs inválidos retornem 400 Bad Request, e IDs inexistentes retornem 404.
-- **Padronize o nome do campo do token JWT** no login para `acess_token`.
-- **Melhore o middleware de autenticação** para usar `next()` ao invés de `throw` dentro do callback do `jwt.verify`.
-- **Fortaleça as validações de payloads** com schemas rigorosos para evitar campos extras ou faltantes.
-- **Amplie a documentação no INSTRUCTIONS.md** para explicar claramente como usar autenticação e acessar os endpoints.
-- **Revise mensagens de erro** para que sejam claras, consistentes e com status code adequado.
+- [ ] Validar corretamente os parâmetros `id` nas rotas de agentes e casos, retornando status 400 para IDs inválidos.  
+- [ ] Garantir que todos os payloads recebidos tenham validação robusta com mensagens de erro consistentes (status 400).  
+- [ ] Ajustar o middleware de autenticação para retornar status 401 (não 403) quando o token for inválido ou expirado.  
+- [ ] Seguir estritamente a estrutura de diretórios e arquivos exigida pelo projeto, especialmente para os arquivos novos de autenticação.  
+- [ ] Implementar os endpoints de logout (`POST /auth/logout`) e exclusão de usuário (`DELETE /users/:id`).  
+- [ ] Corrigir a formatação da data em `agentesRepository.create` para usar o objeto retornado pelo banco.  
 
 ---
 
-Matheus, seu esforço está claro e seu código tem uma base muito boa para uma API robusta e segura! 💪 Não desanime pelos ajustes necessários — são detalhes que fazem toda a diferença para transformar seu projeto em algo profissional e confiável.
+## Finalizando...
 
-Continue focando na segurança, validação e organização do código. Com essas melhorias, você vai ver sua aplicação brilhar ainda mais! 🌟
+Matheus, você está no caminho certo e já mostrou domínio de conceitos complexos como hashing, JWT e proteção de rotas. Com alguns ajustes finos na validação, tratamento de erros e estrutura, seu projeto vai ficar redondinho e pronto para produção! 🚀
 
-Se precisar de ajuda para entender alguma parte, não hesite em perguntar. Estou aqui para te ajudar nessa jornada de aprendizado!
+Continue firme, revise com calma os pontos acima, e não hesite em usar os recursos que te passei para aprofundar seu conhecimento. Estou aqui torcendo pelo seu sucesso — você tem muito potencial! 💙
 
-Um grande abraço e sucesso! 🚀👊
+Abraços e até a próxima revisão! 👊😊
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
