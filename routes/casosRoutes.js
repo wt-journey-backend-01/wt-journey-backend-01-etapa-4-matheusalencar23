@@ -6,6 +6,7 @@ const {
   updateCasoValidation,
   partialUpdateCasoValidation,
 } = require("../utils/casosValidations");
+const { authenticateToken } = require("../middlewares/authMiddleware");
 
 /**
  * @openapi
@@ -47,7 +48,7 @@ const {
  *                  type: string
  *                  example: []
  */
-router.get("/casos/search", casosController.filter);
+router.get("/casos/search", authenticateToken, casosController.filter);
 
 /**
  * @openapi
@@ -106,7 +107,11 @@ router.get("/casos/search", casosController.filter);
  *                  type: string
  *                  example: []
  */
-router.get("/casos/:caso_id/agente", casosController.getAgenteByCasoId);
+router.get(
+  "/casos/:caso_id/agente",
+  authenticateToken,
+  casosController.getAgenteByCasoId
+);
 
 /**
  * @openapi
@@ -165,7 +170,7 @@ router.get("/casos/:caso_id/agente", casosController.getAgenteByCasoId);
  *                  type: string
  *                  example: []
  */
-router.get("/casos/:id", casosController.getCasosById);
+router.get("/casos/:id", authenticateToken, casosController.getCasosById);
 
 /**
  * @openapi
@@ -184,7 +189,7 @@ router.get("/casos/:id", casosController.getCasosById);
  *              items:
  *                $ref: '#/components/schemas/Caso'
  */
-router.get("/casos", casosController.getAllCasos);
+router.get("/casos", authenticateToken, casosController.getAllCasos);
 
 /**
  * @openapi
@@ -241,7 +246,12 @@ router.get("/casos", casosController.getAllCasos);
  *                  type: string
  *                  example: []
  */
-router.post("/casos", newCasoValidation, casosController.createCaso);
+router.post(
+  "/casos",
+  authenticateToken,
+  newCasoValidation,
+  casosController.createCaso
+);
 
 /**
  * @openapi
@@ -305,7 +315,12 @@ router.post("/casos", newCasoValidation, casosController.createCaso);
  *                  type: string
  *                  example: []
  */
-router.put("/casos/:id", updateCasoValidation, casosController.updateCaso);
+router.put(
+  "/casos/:id",
+  authenticateToken,
+  updateCasoValidation,
+  casosController.updateCaso
+);
 
 /**
  * @openapi
@@ -370,6 +385,7 @@ router.put("/casos/:id", updateCasoValidation, casosController.updateCaso);
  */
 router.patch(
   "/casos/:id",
+  authenticateToken,
   partialUpdateCasoValidation,
   casosController.updatePartialCaso
 );
@@ -431,7 +447,7 @@ router.patch(
  *                  type: string
  *                  example: []
  */
-router.delete("/casos/:id", casosController.deleteCaso);
+router.delete("/casos/:id", authenticateToken, casosController.deleteCaso);
 
 /**
  * @openapi

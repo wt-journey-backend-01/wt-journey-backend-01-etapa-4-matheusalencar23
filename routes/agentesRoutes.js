@@ -6,6 +6,7 @@ const {
   updateAgenteValidation,
   partialUpdateAgenteValidation,
 } = require("../utils/agentesValidations");
+const { authenticateToken } = require("../middlewares/authMiddleware");
 
 /**
  * @openapi
@@ -47,7 +48,11 @@ const {
  *                  type: string
  *                  example: []
  */
-router.get("/agentes/:id/casos", agentesController.getCasosByAgenteId);
+router.get(
+  "/agentes/:id/casos",
+  authenticateToken,
+  agentesController.getCasosByAgenteId
+);
 
 /**
  * @openapi
@@ -106,7 +111,7 @@ router.get("/agentes/:id/casos", agentesController.getCasosByAgenteId);
  *                  type: string
  *                  example: []
  */
-router.get("/agentes/:id", agentesController.getAgenteById);
+router.get("/agentes/:id", authenticateToken, agentesController.getAgenteById);
 
 /**
  * @openapi
@@ -125,7 +130,7 @@ router.get("/agentes/:id", agentesController.getAgenteById);
  *              items:
  *                $ref: '#/components/schemas/Agente'
  */
-router.get("/agentes", agentesController.getAllAgentes);
+router.get("/agentes", authenticateToken, agentesController.getAllAgentes);
 
 /**
  * @openapi
@@ -165,7 +170,12 @@ router.get("/agentes", agentesController.getAllAgentes);
  *                  example:
  *                    - O cargo é obrigatório
  */
-router.post("/agentes", newAgenteValidation, agentesController.createAgente);
+router.post(
+  "/agentes",
+  authenticateToken,
+  newAgenteValidation,
+  agentesController.createAgente
+);
 
 /**
  * @openapi
@@ -230,6 +240,7 @@ router.post("/agentes", newAgenteValidation, agentesController.createAgente);
  */
 router.put(
   "/agentes/:id",
+  authenticateToken,
   updateAgenteValidation,
   agentesController.updateAgente
 );
@@ -297,6 +308,7 @@ router.put(
  */
 router.patch(
   "/agentes/:id",
+  authenticateToken,
   partialUpdateAgenteValidation,
   agentesController.updatePartialAgente
 );
@@ -352,7 +364,11 @@ router.patch(
  *                  type: string
  *                  example: []
  */
-router.delete("/agentes/:id", agentesController.deleteAgente);
+router.delete(
+  "/agentes/:id",
+  authenticateToken,
+  agentesController.deleteAgente
+);
 
 /**
  * @openapi
