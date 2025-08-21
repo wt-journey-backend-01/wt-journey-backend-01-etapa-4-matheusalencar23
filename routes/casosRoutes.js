@@ -451,7 +451,7 @@ router.delete("/casos/:id", casosController.deleteCaso);
  *          example: "Disparos foram reportados às 22:33 do dia 10/07/2007 na região do bairro União, resultando na morte da vítima, um homem de 45 anos"
  *        status:
  *          type: string
- *          enum: ["aberto", "fechado"]
+ *          enum: ["aberto", "solucionado"]
  *          example: "aberto"
  *        agente_id:
  *          type: integer
@@ -467,7 +467,7 @@ router.delete("/casos/:id", casosController.deleteCaso);
  *          example: "Disparos foram reportados às 22:33 do dia 10/07/2007 na região do bairro União, resultando na morte da vítima, um homem de 45 anos"
  *        status:
  *          type: string
- *          enum: ["aberto", "fechado"]
+ *          enum: ["aberto", "solucionado"]
  *          example: "aberto"
  *        agente_id:
  *          type: integer
