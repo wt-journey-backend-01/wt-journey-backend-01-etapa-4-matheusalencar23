@@ -33,7 +33,7 @@ async function login(req, res) {
     { expiresIn: "1d" }
   );
 
-  res.status(200).json({ access_token: `Bearer ${token}` });
+  res.status(200).json({ access_token: token });
 }
 
 async function signUp(req, res) {
