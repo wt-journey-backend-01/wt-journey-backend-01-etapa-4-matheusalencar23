@@ -5,7 +5,7 @@ const SECRET = process.env.JWT_SECRET || "secret";
 
 function authenticateToken(req, res, next) {
   const cookieToken = req.cookies?.token;
-  const authHeader = req.headers["Authorization"];
+  const authHeader = req.headers["authorization"];
   const headerToken = authHeader && authHeader.split(" ")[1];
 
   const token = cookieToken || headerToken;
