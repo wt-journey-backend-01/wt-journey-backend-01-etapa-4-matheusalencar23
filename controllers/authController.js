@@ -8,7 +8,7 @@ const SECRET = process.env.JWT_SECRET || "secret";
 async function login(req, res) {
   const { email, senha, nome } = req.body;
 
-  const usuario = await usuariosRepository.findByName(nome);
+  const usuario = await usuariosRepository.findByEmail(email);
 
   if (!usuario) {
     throw new AppError(
