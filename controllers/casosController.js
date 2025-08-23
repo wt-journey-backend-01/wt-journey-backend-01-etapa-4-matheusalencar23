@@ -103,8 +103,11 @@ async function updatePartialCaso(req, res) {
 }
 
 async function deleteCaso(req, res) {
-  const id = req.params.id;
+  const id = Number(req.params.id);
 
+  if (!id || !Number.isInteger(id)) {
+    throw new AppError(404, "Id inválido");
+  }
   const caso = await casosRepository.findById(id);
   if (!caso) {
     throw new AppError(404, "Nenhum caso encontrado para o id especificado");
