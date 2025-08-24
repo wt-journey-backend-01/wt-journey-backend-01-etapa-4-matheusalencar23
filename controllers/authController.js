@@ -6,7 +6,7 @@ const { AppError } = require("../utils/errorHandler");
 const SECRET = process.env.JWT_SECRET || "secret";
 
 async function login(req, res) {
-  const { email, senha, nome } = req.body;
+  const { email, senha } = req.body;
 
   const usuario = await usuariosRepository.findByEmail(email);
 
