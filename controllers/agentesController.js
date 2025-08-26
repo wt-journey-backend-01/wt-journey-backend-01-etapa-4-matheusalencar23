@@ -39,7 +39,10 @@ async function createAgente(req, res) {
 }
 
 async function updateAgente(req, res) {
-  const id = req.params.id;
+  const id = Number(req.params.id);
+  if (!id || !Number.isInteger(id)) {
+    throw new AppError(404, "Id inválido");
+  }
 
   const agente = await agentesRepository.findById(id);
   if (!agente) {
@@ -51,7 +54,10 @@ async function updateAgente(req, res) {
 }
 
 async function updatePartialAgente(req, res) {
-  const id = req.params.id;
+  const id = Number(req.params.id);
+  if (!id || !Number.isInteger(id)) {
+    throw new AppError(404, "Id inválido");
+  }
 
   const agente = await agentesRepository.findById(id);
   if (!agente) {
@@ -63,7 +69,10 @@ async function updatePartialAgente(req, res) {
 }
 
 async function deleteAgente(req, res) {
-  const id = req.params.id;
+  const id = Number(req.params.id);
+  if (!id || !Number.isInteger(id)) {
+    throw new AppError(404, "Id inválido");
+  }
 
   const agente = await agentesRepository.findById(id);
   if (!agente) {
