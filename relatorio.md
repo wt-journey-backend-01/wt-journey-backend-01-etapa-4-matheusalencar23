@@ -2,14 +2,14 @@
 
 # 🧪 Relatório de Avaliação – Journey Levty Etapa 1 - matheusalencar23
 
-**Data:** 26/08/2025 20:33
+**Data:** 26/08/2025 20:36
 
-**Nota Final:** `74.77/100`
+**Nota Final:** `76.36/100`
 **Status:** ✅ Aprovado
 
 ---
 ## ✅ Requisitos Obrigatórios
-- Foram encontrados `18` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
+- Foram encontrados `17` problemas nos requisitos obrigatórios. Veja abaixo os testes que falharam:
   - ⚠️ **Falhou no teste**: `AGENTS: Lista todos os agente corretamente com status code 200 e todos os dados de cada agente listados corretamente`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
   - ⚠️ **Falhou no teste**: `AGENTS: Busca agente por ID corretamente com status code 200 e todos os dados do agente listados dentro de um objeto JSON`
@@ -23,8 +23,6 @@
   - ⚠️ **Falhou no teste**: `AGENTS: Recebe status code 401 ao tentar buscar agente corretamente mas sem header de autorização com token JWT`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
   - ⚠️ **Falhou no teste**: `AGENTS: Recebe status code 404 ao tentar atualizar agente por completo com método PUT de agente de ID em formato incorreto`
-    - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
-  - ⚠️ **Falhou no teste**: `AGENTS: Recebe status code 404 ao tentar deletar agente com ID inválido`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
   - ⚠️ **Falhou no teste**: `CASES: Cria casos corretamente com status code 201 e retorna dados inalterados do caso criado mais seu ID`
     - **Melhoria sugerida**: Nenhuma sugestão de melhoria disponível.
