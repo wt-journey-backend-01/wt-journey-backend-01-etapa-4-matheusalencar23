@@ -7,7 +7,12 @@ async function findAll(filter = {}, orderBy = ["id", "asc"]) {
       .select("*")
       .where(filter)
       .orderBy(orderBy[0], orderBy[1]);
-    return result;
+    return result.map((agente) => ({
+      ...agente,
+      dataDeIncorporacao: new Date(agente.dataDeIncorporacao)
+        .toISOString()
+        .split("T")[0],
+    }));
   } catch (error) {
     throw new AppError(500, "Erro ao buscar agentes", [error.message]);
   }
