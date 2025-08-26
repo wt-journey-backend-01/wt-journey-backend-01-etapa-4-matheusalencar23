@@ -22,7 +22,10 @@ async function getAllAgentes(req, res) {
 }
 
 async function getAgenteById(req, res) {
-  const id = req.params.id;
+  const id = Number(req.params.id);
+  if (!id || !Number.isInteger(id)) {
+    throw new AppError(404, "Id inválido");
+  }
   const agente = await agentesRepository.findById(id);
   if (!agente) {
     throw new AppError(404, "Nenhum agente encontrado para o id especificado");
