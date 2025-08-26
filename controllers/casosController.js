@@ -49,7 +49,10 @@ async function createCaso(req, res) {
 }
 
 async function updateCaso(req, res) {
-  const id = req.params.id;
+  const id = Number(req.params.id);
+  if (!id || !Number.isInteger(id)) {
+    throw new AppError(404, "Id inválido");
+  }
 
   const agenteId = req.body.agente_id;
   if (agenteId) {
@@ -74,7 +77,10 @@ async function updateCaso(req, res) {
 }
 
 async function updatePartialCaso(req, res) {
-  const id = req.params.id;
+  const id = Number(req.params.id);
+  if (!id || !Number.isInteger(id)) {
+    throw new AppError(404, "Id inválido");
+  }
 
   if (req.body.id) {
     throw new AppError(400, "Parâmetros inválidos", [
@@ -122,7 +128,11 @@ async function deleteCaso(req, res) {
 }
 
 async function getAgenteByCasoId(req, res) {
-  const casoId = req.params.caso_id;
+  const casoId = Number(req.params.caso_id);
+  if (!casoId || !Number.isInteger(casoId)) {
+    throw new AppError(404, "Id inválido");
+  }
+
   const caso = await casosRepository.findById(casoId);
   if (!caso) {
     throw new AppError(404, "Nenhum caso encontrado para o id especificado");
