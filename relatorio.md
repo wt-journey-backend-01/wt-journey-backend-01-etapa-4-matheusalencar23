@@ -1,164 +1,210 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 7 créditos restantes para usar o sistema de feedback AI.
+Você tem 6 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para matheusalencar23:
 
-Nota final: **95.9/100**
+Nota final: **98.4/100**
 
-# Feedback para matheusalencar23 🚀
+```markdown
+# Olá, matheusalencar23! 👋🚀
 
-Olá, Matheus! Antes de mais nada, parabéns pelo excelente trabalho! 🎉 Você alcançou uma nota impressionante de **95.9/100**, o que demonstra que sua dedicação e conhecimento estão muito sólidos. Vamos juntos analisar seu projeto para que você possa destravar 100% na próxima!
-
----
-
-## 🎉 Pontos Fortes e Conquistas Bônus
-
-- Sua estrutura de pastas está muito bem organizada, seguindo o padrão MVC com controllers, repositories, middlewares e routes bem separados. Isso facilita muito a manutenção e escalabilidade do projeto.
-- A autenticação via JWT está funcionando corretamente, com geração e validação de tokens, além do hash seguro das senhas usando bcryptjs.
-- Você implementou corretamente o endpoint **/usuarios/me** para retornar informações do usuário autenticado — um bônus importante e que mostra seu domínio do tema.
-- O filtro dos casos por status, agente e palavras-chave está implementado e funcionando, o que é uma funcionalidade avançada muito legal.
-- Os erros customizados com `AppError` estão bem aplicados, garantindo respostas claras e consistentes para o cliente.
-- A documentação Swagger está presente e detalhada, o que é essencial para APIs profissionais.
-- Você protegeu todas as rotas sensíveis com o middleware de autenticação, garantindo segurança na sua API.
+Primeiramente, parabéns pelo excelente trabalho! 🎉 Sua nota final de **98.4/100** é uma demonstração clara do seu esforço e dedicação. Você conseguiu implementar com sucesso a maioria dos requisitos do desafio, incluindo a criação e autenticação de usuários, proteção das rotas com JWT, e a organização do projeto está muito bem estruturada conforme esperado! 👏👏
 
 ---
 
-## ⚠️ Análise dos Testes que Falharam e Possíveis Causas
+## 🎯 Pontos Fortes que Merecem Destaque
 
-### Testes que falharam:
-- **AGENTS: Recebe status code 401 ao tentar buscar agente corretamente mas sem header de autorização com token JWT**
-- **CASES: Recebe status code 404 ao tentar atualizar um caso por completo com método PUT de um caso com ID inválido**
-- **CASES: Recebe status code 404 ao tentar atualizar um caso parcialmente com método PATCH de um caso com ID inválido**
-
----
-
-### Análise detalhada do teste:  
-**AGENTS: Recebe status code 401 ao tentar buscar agente corretamente mas sem header de autorização com token JWT**
-
-- O teste espera que, ao tentar acessar rotas de agentes sem o token JWT no header `Authorization`, a API retorne **401 Unauthorized**.
-- Seu middleware `authenticateToken` está implementado corretamente para lançar um `AppError(401, "Token não fornecido.")` quando o token está ausente.
-- Porém, no arquivo `server.js`, a ordem de uso das rotas está assim:
-  ```js
-  app.use(authRouter);
-  app.use(casosRouter);
-  app.use(agentesRouter);
-  ```
-- Isso é correto, mas o problema pode estar no fato de que o middleware `authenticateToken` está aplicado nas rotas de agentes e casos, porém, se algum erro na validação do token for lançado dentro do middleware, ele precisa ser tratado corretamente para que o status 401 seja enviado.
+- Sua estrutura de diretórios está **muito bem organizada** e segue o padrão MVC esperado, com separação clara entre controllers, repositories, rotas, middlewares e utils.
+- O uso do **bcrypt** para hash de senhas e o JWT para autenticação estão muito bem implementados.
+- Você aplicou corretamente o middleware de autenticação (`authenticateToken`) nas rotas sensíveis (`/agentes` e `/casos`).
+- O tratamento de erros customizado com a classe `AppError` está consistente e ajuda a manter respostas claras.
+- A documentação via Swagger está presente nas rotas, e o arquivo `INSTRUCTIONS.md` contém instruções úteis para rodar o projeto.
+- Você implementou vários bônus, como:
+  - Endpoint para filtragem de casos por palavras-chave e status.
+  - Endpoint para buscar o agente responsável por determinado caso.
+  - Endpoint `/usuarios/me` para retornar dados do usuário autenticado.
   
-- Verifique se o seu middleware `authMiddleware.js` está corretamente propagando o erro para o `errorHandler`:
-  ```js
+Muito bom! Isso mostra que você foi além do básico. 🌟
+
+---
+
+## 🔍 Teste que Falhou e Análise Detalhada
+
+### Teste que falhou:
+- **`AGENTS: Recebe status code 401 ao tentar buscar agente corretamente mas sem header de autorização com token JWT`**
+
+Esse teste verifica se sua API retorna **401 Unauthorized** quando alguém tenta acessar rotas protegidas sem enviar o token JWT no header `Authorization`.
+
+---
+
+### Análise profunda do problema
+
+Seu middleware `authenticateToken` está assim:
+
+```js
+async function authenticateToken(req, res, next) {
+  const cookieToken = req.cookies?.token;
+  const authHeader = req.headers["authorization"];
+  const headerToken = authHeader && authHeader.split(" ")[1];
+
+  const token = cookieToken || headerToken;
+
+  if (!token) {
+    throw new AppError(401, "Token não fornecido.");
+  }
+
   jwt.verify(token, SECRET, (err, user) => {
     if (err) {
       throw new AppError(403, "Token inválido ou expirado.");
     }
+
     req.user = user;
     next();
   });
-  ```
-- Note que você lança um erro com status 403 para token inválido ou expirado — mas o teste espera 401 para token ausente ou inválido. O recomendado é usar **401 Unauthorized** para ambos os casos (ausência ou invalidação de token).  
-- Então, sugiro ajustar o status code para 401 neste trecho:
-  ```js
-  if (err) {
-    throw new AppError(401, "Token inválido ou expirado.");
+}
+```
+
+**Aqui está o ponto crítico:**
+
+- Você está tentando obter o token do cookie (`req.cookies?.token`), mas **não há nenhum middleware para parsear cookies instalado ou configurado no `server.js`** (como `cookie-parser`).
+- Se o token não estiver no cookie (o que provavelmente é o caso nos testes), você pega o token do header `Authorization`, o que é correto.
+- Porém, a ordem que você usa para pegar o token é: `cookieToken || headerToken`.
+- Se `cookieToken` for `undefined` (porque o middleware de cookies não existe), tudo bem, ele vai usar o `headerToken`.
+- Isso parece correto, mas o problema real está no fato de que **você está usando `throw` dentro do callback do `jwt.verify`**, que é assíncrono, e isso não cai no seu middleware de tratamento de erros global.
+
+**Por que isso é um problema?**
+
+- O `jwt.verify` usa um callback, e lançar exceções dentro dele não é capturado pelo Express, causando que a requisição fique pendente ou o erro não seja tratado corretamente.
+- Para que o Express capture erros em middlewares assíncronos, você deve usar o padrão `try/catch` com `async/await` ou chamar `next(err)` para passar o erro para o middleware de erro.
+- Como o erro não está sendo tratado corretamente, os testes esperam o status 401, mas sua API pode estar retornando outro status ou até travando.
+
+---
+
+### Como corrigir?
+
+Você pode usar a versão **síncrona** do `jwt.verify` com `try/catch`, ou usar a versão assíncrona com `promises` e `async/await`. Um exemplo simples usando `try/catch`:
+
+```js
+const jwt = require("jsonwebtoken");
+const { AppError } = require("../utils/errorHandler");
+
+const SECRET = process.env.JWT_SECRET || "secret";
+
+async function authenticateToken(req, res, next) {
+  try {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+      throw new AppError(401, "Token não fornecido.");
+    }
+
+    // Verificação síncrona para capturar erros no try/catch
+    const user = jwt.verify(token, SECRET);
+
+    req.user = user;
+    next();
+  } catch (err) {
+    // Diferencia entre token inválido e outros erros
+    if (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError") {
+      return next(new AppError(401, "Token inválido ou expirado."));
+    }
+    next(err);
   }
-  ```
-- Isso vai alinhar sua resposta com o esperado pelos testes e o padrão HTTP de autenticação.
+}
+
+module.exports = { authenticateToken };
+```
+
+**Explicação:**
+
+- Remove a dependência do cookie (que não está configurado).
+- Usa `jwt.verify` de forma síncrona dentro do `try/catch`.
+- Se o token for inválido ou expirado, lança um erro 401.
+- Passa o erro para o middleware de tratamento de erros com `next(err)` para o Express lidar corretamente.
 
 ---
 
-### Análise detalhada dos testes:  
-**CASES: Recebe status code 404 ao tentar atualizar um caso por completo com método PUT de um caso com ID inválido**  
-**CASES: Recebe status code 404 ao tentar atualizar um caso parcialmente com método PATCH de um caso com ID inválido**
+### Por que isso é importante?
 
-- Esses testes verificam que, ao tentar atualizar um caso com um ID inválido (não numérico, negativo ou inexistente), a API deve retornar 404 Not Found.
-- No seu controller `casosController.js`, você faz a validação do ID assim:
-  ```js
-  const id = Number(req.params.id);
-  if (!id || !Number.isInteger(id)) {
-    throw new AppError(404, "Id inválido");
-  }
-  ```
-- Aqui está o problema: se o `id` for `0`, `Number(0)` é `0`, que é falsy, e você lança o erro, o que é correto. Porém, se o parâmetro for uma string que não é número, `Number("abc")` retorna `NaN`, que também é falsy e vai lançar o erro. Isso está correto para identificar IDs inválidos.
-- Porém, o teste pode estar passando um ID negativo (ex: -1), e você não está validando explicitamente se o ID é positivo.  
-- No seu controller, para o método `deleteAgente` você faz essa validação:
-  ```js
-  if (!id || !Number.isInteger(id) || id < 0) {
-    throw new AppError(404, "Id inválido");
-  }
-  ```
-- Seria bom fazer o mesmo para os métodos de atualização de casos (`updateCaso`, `updatePartialCaso`) para garantir que IDs negativos sejam rejeitados com 404.
-- Além disso, verifique se o fluxo para IDs inexistentes está correto: você checa se o caso existe com `findById` e lança 404 se não existir, o que está certo.
-- Sugestão de ajuste para validação do ID:
-  ```js
-  const id = Number(req.params.id);
-  if (!id || !Number.isInteger(id) || id <= 0) {
-    throw new AppError(404, "Id inválido");
-  }
-  ```
-- Isso vai garantir que IDs negativos ou zero sejam tratados como inválidos, evitando falhas nos testes.
+Quando trabalhamos com middlewares Express, erros lançados dentro de callbacks assíncronos **não são capturados automaticamente**. Isso pode fazer sua API não responder corretamente, causando falhas nos testes de autenticação.
 
 ---
 
-## 🗂️ Sobre a Estrutura do Projeto
+## Outras Observações e Recomendações
 
-Sua estrutura está muito alinhada com o esperado! Você tem os diretórios:
+- **Middleware de Cookies:** Se quiser aceitar token via cookie, você deve instalar e configurar o `cookie-parser` em `server.js`:
 
-- `db/migrations` e `db/seeds` para banco e dados iniciais.
-- `controllers/`, `repositories/`, `routes/` e `middlewares/` bem organizados.
-- `utils/errorHandler.js` para tratamento centralizado de erros.
-- Arquivos `.env`, `knexfile.js` e `server.js` no lugar certo.
+```js
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+```
 
-Isso é muito importante para projetos profissionais, parabéns!
+- Caso contrário, remova a tentativa de ler o token do cookie para evitar confusão.
 
----
+- **Consistência no nome do token no retorno do login:** No seu `authController.js` você retorna:
 
-## 🛠️ Recomendações e Boas Práticas
+```js
+res.status(200).json({ access_token: token });
+```
 
-1. **Status HTTP para autenticação:**  
-   Alinhe o status HTTP retornado no middleware de autenticação para `401 Unauthorized` tanto para token ausente quanto para inválido/expirado. Isso segue o padrão REST e ajuda a passar os testes.
+Mas no enunciado do projeto o exemplo mostra:
 
-2. **Validação rigorosa de IDs:**  
-   Sempre valide se o ID é um número inteiro **positivo** e maior que zero, para evitar erros inesperados e garantir que IDs inválidos sejam tratados com 404.
+```json
+{
+  "acess_token": "token aqui"
+}
+```
 
-3. **Tratamento de erros no middleware:**  
-   Certifique-se que erros lançados dentro do middleware `authenticateToken` sejam capturados pelo seu `errorHandler` para que o cliente receba a resposta adequada.
+Perceba que está com "acess_token" (com "s"), e você usa "access_token" (com "ss"). Essa diferença pode causar falhas em testes automatizados que esperam o nome exato do campo. Recomendo alinhar para o que o teste espera:
 
-4. **Documentação:**  
-   Continue mantendo a documentação atualizada no Swagger e no `INSTRUCTIONS.md`, mostrando claramente como usar os tokens JWT e os endpoints protegidos.
-
----
-
-## 📚 Recursos para Aprimorar
-
-- Para entender melhor o uso correto dos códigos HTTP em autenticação e autorização, veja esse vídeo, feito pelos meus criadores, que fala muito bem sobre conceitos básicos de cibersegurança e autenticação:  
-  https://www.youtube.com/watch?v=Q4LQOfYwujk
-
-- Para aprofundar no uso de JWT na prática, veja este vídeo:  
-  https://www.youtube.com/watch?v=keS0JWOypIU
-
-- Para dominar o uso de bcrypt e JWT juntos:  
-  https://www.youtube.com/watch?v=L04Ln97AwoY
-
-- Caso queira revisar boas práticas de arquitetura MVC em Node.js para manter sua estrutura limpa e escalável:  
-  https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s
+```js
+res.status(200).json({ acess_token: token });
+```
 
 ---
 
-## 📝 Resumo dos Pontos para Focar
+## Recursos para você aprofundar:
 
-- [ ] Ajustar o status HTTP para token inválido/expirado no middleware para **401** (não 403).  
-- [ ] Validar IDs nos controllers para garantir que sejam inteiros **positivos** (> 0).  
-- [ ] Garantir que erros no middleware de autenticação sejam capturados pelo `errorHandler`.  
-- [ ] Revisar documentação para deixar claro o uso correto do token JWT no header `Authorization`.  
+- Para entender melhor os conceitos e a prática correta de autenticação JWT e tratamento de erros no Express, recomendo fortemente este vídeo, feito pelos meus criadores, que fala muito bem sobre autenticação:  
+  ▶️ https://www.youtube.com/watch?v=Q4LQOfYwujk
+
+- Para compreender o uso correto do JWT na prática, incluindo verificação e geração de tokens:  
+  ▶️ https://www.youtube.com/watch?v=keS0JWOypIU
+
+- Para entender o uso do bcrypt para hashing de senhas e boas práticas:  
+  ▶️ https://www.youtube.com/watch?v=L04Ln97AwoY
+
+- Caso queira entender mais sobre arquitetura MVC e organização de projetos Node.js, que você já aplicou muito bem:  
+  ▶️ https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s
 
 ---
 
-Matheus, você está muito próximo da perfeição! Seu código está limpo, organizado e seguro, e as funcionalidades principais estão muito bem implementadas. Com esses ajustes finos, você vai garantir que sua API esteja 100% alinhada com os requisitos e passando todos os testes. Continue assim, essa jornada está incrível! 🚀✨
+## Resumo dos pontos para foco imediato ✅
 
-Se precisar de ajuda para entender algum ponto específico, me avise! Estou aqui para te ajudar a crescer cada vez mais. 😉
+- [ ] Corrigir o middleware `authenticateToken` para usar `try/catch` e evitar lançar erros dentro do callback do `jwt.verify`.
+- [ ] Alinhar o nome do campo do token retornado no login para `acess_token` conforme o requisito do desafio.
+- [ ] (Opcional) Configurar `cookie-parser` se desejar suportar token via cookie, ou remover essa lógica para evitar confusão.
+- [ ] Testar novamente as rotas protegidas sem token para garantir que retornam **401 Unauthorized** corretamente.
+- [ ] Continuar mantendo a organização do projeto e o tratamento de erros customizado, que estão muito bons.
 
-Abraços e sucesso! 👊💻
+---
+
+## Finalizando 🚀
+
+Você está muito próximo da perfeição! Seu projeto está robusto e bem estruturado, e com esses pequenos ajustes na autenticação JWT, você vai garantir que a segurança esteja 100% alinhada com as boas práticas e os requisitos do desafio.
+
+Continue assim, com essa dedicação e atenção aos detalhes! Se precisar de ajuda para implementar o middleware ou qualquer outra dúvida, só chamar. Estou aqui para ajudar! 💪😊
+
+Um forte abraço e sucesso no seu aprendizado! 👊✨
+
+---
+
+Se quiser, posso ajudar a montar o código corrigido do middleware para você testar, é só pedir! 😉
+
+---
+```
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
