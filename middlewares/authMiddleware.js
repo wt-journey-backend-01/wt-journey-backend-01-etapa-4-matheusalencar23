@@ -12,8 +12,7 @@ function authenticateToken(req, res, next) {
       return;
     }
 
-    const headerToken = authHeader && authHeader.split(" ")[1];
-    const token = headerToken;
+    const token = authHeader && authHeader.split(" ")[1];
 
     if (!token) {
       next(new AppError(401, "Token não fornecido."));

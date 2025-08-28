@@ -1,8 +1,8 @@
 const express = require("express");
-const dotenv = require("dotenv");
+require("dotenv").config();
 const swagger = require("./docs/swagger");
+const { authenticateToken } = require("./middlewares/authMiddleware");
 
-dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -14,8 +14,8 @@ const { errorHandler } = require("./utils/errorHandler");
 app.use(express.json());
 
 app.use(authRouter);
-app.use(casosRouter);
-app.use(agentesRouter);
+app.use("/casos", authenticateToken, casosRouter);
+app.use("/agentes", authenticateToken, agentesRouter);
 
 swagger(app);
 
