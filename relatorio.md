@@ -1,84 +1,70 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 9 créditos restantes para usar o sistema de feedback AI.
+Você tem 8 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para matheusalencar23:
 
 Nota final: **94.3/100**
 
-```markdown
-# Olá, matheusalencar23! 👋🚀
+# Feedback para matheusalencar23 🚔✨
 
-Primeiramente, parabéns pelo seu esforço e dedicação em levar essa API para um nível profissional com segurança, autenticação e autorização! 🎉 Você alcançou uma nota excelente: **94.3/100**, o que já mostra que seu trabalho está muito bem feito. Vamos juntos analisar seus acertos e os pontos que precisam de atenção para você destravar 100%!
-
----
-
-## 🎉 Seus Grandes Acertos e Conquistas Bônus
-
-- **Usuários:** Você implementou corretamente o cadastro (`POST /auth/register`), login (`POST /auth/login`), logout e exclusão de usuários, com validações robustas e tratamento adequado de erros.  
-- **JWT:** O token JWT está sendo gerado com expiração válida, e você está utilizando a variável de ambiente `JWT_SECRET` para o segredo, o que é uma ótima prática de segurança.  
-- **Proteção de rotas:** Você aplicou o middleware `authenticateToken` nas rotas de agentes e casos, garantindo que só usuários autenticados acessem esses recursos.  
-- **Filtros e buscas:** Implementou endpoints para filtragem de casos por status, agente e palavras-chave, além da busca do agente responsável por um caso.  
-- **Documentação:** O uso do Swagger para documentar as rotas está muito bem estruturado, facilitando o entendimento da API.  
-- **Estrutura do projeto:** A organização dos arquivos e pastas está alinhada com o esperado, mantendo uma arquitetura clara e escalável.  
-
-Além disso, você avançou nos testes bônus relacionados a filtragem, busca e mensagens customizadas de erro — um baita diferencial! 👏
+Olá, Matheus! Primeiro, parabéns pelo seu esforço e dedicação nesse desafio tão completo e importante! 🎉 Você entregou uma API robusta, com boa organização e muitos detalhes bem cuidados. Sua nota final de **94.3/100** é reflexo do seu empenho! Vamos juntos analisar o que está brilhando e o que podemos lapidar para alcançar a perfeição.
 
 ---
 
-## 🕵️ Análise dos Testes que Falharam e Como Corrigir
+## 🎉 Pontos Fortes e Conquistas Bônus
 
-Você teve algumas falhas nos testes base importantes, principalmente relacionados a status codes 401 e 404 em operações de agentes e casos. Vamos destrinchar cada um para entender o motivo e como melhorar.
+- Você implementou a autenticação JWT com bcrypt de forma correta, garantindo a segurança das senhas e a geração dos tokens. Isso ficou muito bem feito!
+- O middleware de autenticação (`authMiddleware.js`) está funcionando para proteger as rotas sensíveis, o que é essencial para segurança.
+- A estrutura do projeto está muito próxima do esperado, com separação clara entre controllers, repositories, middlewares e rotas.
+- Você criou as migrations e seeds adequadamente, incluindo a tabela de usuários com os campos corretos.
+- A documentação via Swagger está sendo usada, o que é um diferencial profissional.
+- Você também implementou endpoints bônus como `/usuarios/me` e a filtragem de casos, mostrando que foi além do requisito básico.
+- Os testes relacionados a usuários passaram todos, incluindo validações de senha e email, criação, login, logout e exclusão. Excelente!
 
 ---
 
-### 1. Teste:  
-**"AGENTS: Recebe status code 401 ao tentar buscar agente corretamente mas sem header de autorização com token JWT"**
+## 🚨 Testes que Falharam e Análise Detalhada
 
-**O que isso significa:**  
-Quando uma requisição para buscar agentes é feita sem o token JWT no header `Authorization`, o servidor deve responder com `401 Unauthorized`.
+### Testes que falharam:
 
-**Análise no seu código:**  
-No arquivo `routes/agentesRoutes.js`, você aplicou o middleware `authenticateToken` em todas as rotas de agentes, o que está correto. Porém, olhando para o middleware `authMiddleware.js`:
+1. **AGENTS: Recebe status code 401 ao tentar buscar agente corretamente mas sem header de autorização com token JWT**
+2. **AGENTS: Recebe status code 404 ao tentar atualizar agente por completo com método PUT de agente de ID em formato incorreto**
+3. **CASES: Recebe status code 404 ao tentar atualizar um caso por completo com método PUT de um caso com ID inválido**
+4. **CASES: Recebe status code 404 ao tentar atualizar um caso parcialmente com método PATCH de um caso com ID inválido**
+
+---
+
+### Análise Raiz: Por que esses testes falharam?
+
+Vou destrinchar cada um para te ajudar a entender o que está acontecendo.
+
+---
+
+### 1. AGENTS: status 401 ao buscar agente sem token JWT no header
+
+**O que o teste espera:**  
+Que ao tentar acessar endpoints protegidos (ex: `/agentes/:id`) sem o header `Authorization` com token JWT, a API retorne **401 Unauthorized** e não permita o acesso.
+
+**O que seu código faz:**  
+No arquivo `middlewares/authMiddleware.js`, seu middleware `authenticateToken` verifica o token no cookie ou no header. Se não existir token, ele lança um erro 401, o que está correto.
+
+**Possível causa do problema:**  
+No seu `server.js`, veja como você aplica as rotas:
 
 ```js
-function authenticateToken(req, res, next) {
-  const cookieToken = req.cookies?.token;
-  const authHeader = req.headers["authorization"];
-  const headerToken = authHeader && authHeader.split(" ")[1];
-
-  const token = cookieToken || headerToken;
-
-  if (!token) {
-    throw new AppError(401, "Token não fornecido.");
-  }
-
-  jwt.verify(token, SECRET, (err, user) => {
-    if (err) {
-      throw new AppError(403, "Token inválido ou expirado.");
-    }
-
-    req.user = user;
-    next();
-  });
-}
+app.use(authRouter);
+app.use(casosRouter);
+app.use(agentesRouter);
 ```
 
-Você está correto em verificar o token no header ou cookie. O problema pode estar na forma como o erro é tratado: você está **lançando** um erro (`throw new AppError`) dentro do middleware. Para que o Express capture esse erro e retorne o status adequado, você precisa garantir que o `errorHandler` middleware está configurado para capturar erros lançados de forma síncrona e assíncrona.
+Por padrão, o Express aplica middlewares na ordem em que são declarados. Seu middleware de autenticação (`authenticateToken`) está aplicado dentro das rotas `agentesRoutes.js` e `casosRoutes.js`, mas **não está aplicado globalmente**.
 
-No seu `server.js`, você tem:
+O problema pode estar relacionado a como o middleware trata erros: você está usando `throw new AppError()` dentro do middleware, mas o Express, para middlewares assíncronos, espera que erros sejam passados para o `next(err)` para que o `errorHandler` capture.
 
-```js
-app.use(errorHandler);
-```
+**Solução sugerida:**
 
-Isso é ótimo, mas o Express 5 (que você está usando) tem suporte para erros lançados com `throw` em middlewares async, porém, se o middleware não for async, o erro pode não ser capturado corretamente.
-
-**Possível causa raiz:**  
-Se o middleware `authenticateToken` não for declarado como `async` e você lançar erros com `throw`, o Express pode não capturar esses erros e responder com o código padrão (geralmente 500), em vez de 401.
-
-**Sugestão:**  
-Transforme seu middleware para usar `return next(new AppError(...))` ao invés de `throw`, ou use um wrapper para async middlewares. Por exemplo:
+Altere seu middleware para usar `next()` com o erro, assim:
 
 ```js
 function authenticateToken(req, res, next) {
@@ -103,20 +89,17 @@ function authenticateToken(req, res, next) {
 }
 ```
 
-Assim, o Express vai encaminhar o erro para o middleware de tratamento e retornar o status correto.
+Isso garante que o erro seja passado para o middleware de tratamento de erros e o Express consiga enviar a resposta correta.
 
 ---
 
-### 2. Testes:  
-- **"AGENTS: Recebe status code 404 ao tentar atualizar agente por completo com método PUT de agente de ID em formato incorreto"**  
-- **"CASES: Recebe status code 404 ao tentar atualizar um caso por completo com método PUT de um caso com ID inválido"**  
-- **"CASES: Recebe status code 404 ao tentar atualizar um caso parcialmente com método PATCH de um caso com ID inválido"**
+### 2. AGENTS: status 404 ao atualizar agente com ID inválido (PUT)
 
-**O que isso significa:**  
-Se o ID passado na URL para atualizar agente ou caso não for um número válido, o servidor deve responder com `404 Not Found`.
+**O que o teste espera:**  
+Que se for passado um ID inválido (ex: string que não é número) na URL para atualizar um agente, a API retorne 404 com mensagem clara.
 
-**Análise no seu código:**  
-Nos controllers `agentesController.js` e `casosController.js`, você faz a validação do ID assim:
+**O que seu código faz:**  
+No `agentesController.js`, você tem:
 
 ```js
 const id = Number(req.params.id);
@@ -125,81 +108,164 @@ if (!id || !Number.isInteger(id)) {
 }
 ```
 
-**Problema:**  
-Essa validação pode falhar para o ID 0, que não é um ID válido, mas também para IDs falsy como `NaN`. Porém, o problema maior é que se o ID for uma string que começa com número, `Number("123abc")` retorna `NaN`, o que é detectado.
+O problema aqui é que `Number("0")` retorna 0, que é falsy, e `!id` será true, mesmo que 0 seja um número inteiro válido (apesar de id 0 normalmente não existir). Porém, IDs geralmente começam em 1, então isso pode ser aceitável.
 
-Porém, o problema está no uso do `!id` para validar. Se o ID for `0`, `!id` será `true`, e o erro será lançado. Como IDs geralmente começam em 1, isso pode estar ok, mas é mais seguro validar assim:
+O problema maior é que se o parâmetro for uma string que não converte para número, o `Number()` retorna `NaN`, e `!NaN` é `true`, o que faz lançar o erro.
+
+**Porém, o teste está falhando, o que indica que talvez o erro não está sendo tratado corretamente.**
+
+**Possível causa:**  
+Novamente, você está usando `throw new AppError()` dentro de funções assíncronas, mas não está usando `try/catch` para capturar e passar o erro para o middleware. Se você não usa um middleware para capturar erros assíncronos, o Express não consegue tratar o erro e a resposta falha.
+
+**Solução:**  
+Use um wrapper para capturar erros assíncronos, por exemplo:
 
 ```js
-const id = Number(req.params.id);
-if (!Number.isInteger(id) || id <= 0) {
-  throw new AppError(404, "Id inválido");
+function asyncHandler(fn) {
+  return function (req, res, next) {
+    Promise.resolve(fn(req, res, next)).catch(next);
+  };
 }
 ```
 
-Assim, você evita aceitar IDs negativos ou zero.
-
----
-
-## ✅ Pequenas melhorias que vão te ajudar
-
-- **Padronize os status codes e mensagens:** No `authController.js`, quando o usuário não existe, você retorna `404`, mas para credenciais inválidas, retorna `401`. Isso está correto, mas para casos de ID inválido, talvez `400 Bad Request` seja mais apropriado que `404 Not Found`, pois o problema é na forma do ID, não na inexistência do recurso. Isso pode ser ajustado conforme sua preferência, mas atenção para manter consistência.
-
-- **Excluir senha do usuário retornado:** Você fez isso no `signUp`:
+E aplique nas rotas:
 
 ```js
-delete novoUsuario.senha;
+router.put("/agentes/:id", authenticateToken, updateAgenteValidation, asyncHandler(agentesController.updateAgente));
 ```
 
-Ótimo! Faça isso também em outras respostas que retornam dados do usuário.
-
-- **Middleware async:** Se futuramente usar async no middleware, lembre-se de capturar erros com `try/catch` ou usar wrappers para async middlewares.
+Ou, no controller, use `try/catch` e chame `next(err)`.
 
 ---
 
-## 📚 Recursos recomendados para você:
+### 3 e 4. CASES: status 404 ao atualizar caso com ID inválido (PUT e PATCH)
 
-- Para entender melhor o tratamento de erros em middlewares Express e o fluxo do `next()`:  
+**Análise similar ao item 2:**  
+Você faz conversão do ID para número e lança erros com `throw new AppError()`. O mesmo problema de tratamento de erros assíncronos pode estar acontecendo.
+
+---
+
+## 🛠️ Recomendações práticas para corrigir os problemas
+
+1. **Middleware async error handling:**  
+   Como seu código usa funções async nos controllers, é fundamental garantir que erros lançados sejam capturados e repassados para o middleware de erro. Você pode criar um wrapper `asyncHandler` para isso e envolver todas as funções assíncronas dos controllers.
+
+2. **Ajustar middleware de autenticação para usar `next(err)` em vez de `throw`:**
+
+```js
+function authenticateToken(req, res, next) {
+  const cookieToken = req.cookies?.token;
+  const authHeader = req.headers["authorization"];
+  const headerToken = authHeader && authHeader.split(" ")[1];
+
+  const token = cookieToken || headerToken;
+
+  if (!token) {
+    return next(new AppError(401, "Token não fornecido."));
+  }
+
+  jwt.verify(token, SECRET, (err, user) => {
+    if (err) {
+      return next(new AppError(403, "Token inválido ou expirado."));
+    }
+
+    req.user = user;
+    next();
+  });
+}
+```
+
+3. **Garantir tratamento de erros nos controllers:**  
+   Exemplo para `updateAgente`:
+
+```js
+async function updateAgente(req, res, next) {
+  try {
+    const id = Number(req.params.id);
+    if (!id || !Number.isInteger(id)) {
+      throw new AppError(404, "Id inválido");
+    }
+
+    const agente = await agentesRepository.findById(id);
+    if (!agente) {
+      throw new AppError(404, "Nenhum agente encontrado para o id especificado");
+    }
+
+    const updatedAgente = await agentesRepository.update(id, req.body);
+    res.status(200).json(updatedAgente);
+  } catch (error) {
+    next(error);
+  }
+}
+```
+
+Ou use o `asyncHandler` para evitar repetição.
+
+4. **Confirme que o middleware de erro está registrado no final do `server.js`:**
+
+```js
+app.use(errorHandler);
+```
+
+Você já fez isso, o que é ótimo!
+
+---
+
+## 📁 Sobre a Estrutura de Diretórios
+
+Sua estrutura está muito bem organizada e segue o padrão esperado, com pastas para:
+
+- `controllers/`
+- `repositories/`
+- `routes/`
+- `middlewares/`
+- `db/migrations` e `db/seeds`
+- `utils/`
+
+Isso é excelente e facilita muito a manutenção e escalabilidade do projeto!
+
+---
+
+## 💡 Recursos para você se aprofundar
+
+- Sobre tratamento de erros assíncronos no Express e boas práticas:  
   https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s (Refatoração e Boas Práticas de Código)
 
-- Para aprofundar em autenticação JWT e tratamento de erros:  
-  https://www.youtube.com/watch?v=Q4LQOfYwujk (Conceitos básicos de cibersegurança e autenticação)  
-  https://www.youtube.com/watch?v=keS0JWOypIU (JWT na prática)
+- Para entender melhor autenticação JWT e middleware:  
+  https://www.youtube.com/watch?v=Q4LQOfYwujk (Conceitos básicos e fundamentais de cibersegurança)
 
-- Para aprimorar suas validações de IDs e parâmetros:  
-  https://www.youtube.com/watch?v=L04Ln97AwoY (Uso de JWT e BCrypt, boas práticas)
+- Sobre uso prático de JWT e bcrypt:  
+  https://www.youtube.com/watch?v=L04Ln97AwoY (JWT e BCrypt na prática)
 
----
-
-## ⚙️ Sobre a Estrutura do Projeto
-
-Sua estrutura está muito bem organizada e segue o padrão esperado, com pastas separadas para controllers, repositories, middlewares, routes e utils. Isso é fundamental para manter o projeto escalável e fácil de manter. Continue assim!
+- Para Knex.js e manipulação do banco:  
+  https://www.youtube.com/watch?v=GLwHSs7t3Ns&t=4s (Knex Query Builder)
 
 ---
 
-## 📝 Resumo dos Principais Pontos para Focar
+## ✨ Resumo dos principais pontos para focar
 
-- [ ] Ajustar o middleware `authenticateToken` para usar `return next(new AppError(...))` em vez de `throw`, garantindo que erros sejam capturados e retornem status 401/403 corretamente.  
-- [ ] Melhorar a validação de IDs para aceitar somente inteiros positivos maiores que zero.  
-- [ ] Padronizar mensagens e status codes para IDs inválidos (pode ser 400 ou 404, mas mantenha consistente).  
-- [ ] Garantir que o middleware de erro (`errorHandler`) esteja preparado para capturar erros lançados em middlewares síncronos e assíncronos.  
-- [ ] Continuar removendo campos sensíveis (como senha) dos objetos retornados em todas as respostas.  
-
----
-
-## 🎯 Conclusão
-
-matheusalencar23, seu projeto está muito bem estruturado e você dominou conceitos essenciais de autenticação, autorização e segurança! Os pequenos ajustes que sugeri vão garantir que sua API responda exatamente como esperado nos testes, especialmente nos casos de erro, o que é fundamental para aplicações profissionais.
-
-Continue assim, sempre buscando entender a raiz dos problemas e aprimorar a experiência do usuário e a segurança da sua aplicação! 🚀
-
-Qualquer dúvida, pode contar comigo para ajudar a destravar esses pontos. Força na caminhada! 💪
+- [ ] Ajustar middleware de autenticação para usar `next(err)` em vez de `throw` para erros síncronos e assíncronos.
+- [ ] Garantir tratamento correto de erros em funções assíncronas dos controllers, usando `try/catch` + `next(err)` ou um wrapper `asyncHandler`.
+- [ ] Confirmar que os IDs recebidos nas rotas são validados corretamente e que erros são tratados para evitar falhas inesperadas.
+- [ ] Testar rotas protegidas sem token para garantir que retornam 401 corretamente.
+- [ ] Revisar e testar as atualizações (PUT e PATCH) com IDs inválidos para garantir que retornam 404 conforme esperado.
 
 ---
 
-Abraços virtuais,  
-Seu Code Buddy 🤖✨
-```
+## 🚀 Considerações finais
+
+Matheus, seu trabalho está muito bom e você já domina conceitos avançados como autenticação JWT, hashing de senha, proteção de rotas e organização de projeto. Os pequenos ajustes no tratamento de erros vão fazer sua API ficar ainda mais profissional e confiável.
+
+Continue assim, com essa vontade de aprender e melhorar! Você está no caminho certo para se tornar um expert em backend Node.js.
+
+Se precisar de ajuda para implementar o tratamento de erros ou quiser discutir algum ponto, é só chamar! 😉
+
+Boa codificação e sucesso sempre! 👊🔥
+
+---
+
+Abraços,  
+Seu Code Buddy 💙
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
