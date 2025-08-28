@@ -21,7 +21,7 @@ async function getAllCasos(req, res) {
 
 async function getCasosById(req, res) {
   const id = Number(req.params.id);
-  if (!id || !Number.isInteger(id)) {
+  if (!id || !Number.isInteger(id) || id < 0) {
     throw new AppError(404, "Id inválido");
   }
   const caso = await casosRepository.findById(id);
@@ -50,7 +50,7 @@ async function createCaso(req, res) {
 
 async function updateCaso(req, res) {
   const id = Number(req.params.id);
-  if (!id || !Number.isInteger(id)) {
+  if (!id || !Number.isInteger(id) || id < 0) {
     throw new AppError(404, "Id inválido");
   }
 
@@ -78,7 +78,7 @@ async function updateCaso(req, res) {
 
 async function updatePartialCaso(req, res) {
   const id = Number(req.params.id);
-  if (!id || !Number.isInteger(id)) {
+  if (!id || !Number.isInteger(id) || id < 0) {
     throw new AppError(404, "Id inválido");
   }
 
@@ -111,7 +111,7 @@ async function updatePartialCaso(req, res) {
 async function deleteCaso(req, res) {
   const id = Number(req.params.id);
 
-  if (!id || !Number.isInteger(id)) {
+  if (!id || !Number.isInteger(id) || id < 0) {
     throw new AppError(404, "Id inválido");
   }
   const caso = await casosRepository.findById(id);

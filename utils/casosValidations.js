@@ -28,12 +28,6 @@ const newCasoValidation = (req, res, next) => {
 
 const updateCasoValidation = (req, res, next) => {
   const updateCaso = z.object({
-    params: z.object({
-      id: z.coerce
-        .number({ error: "Id inválido" })
-        .int({ error: "Id inválido" })
-        .positive({ error: "Id inválido" }),
-    }),
     body: z
       .looseObject({
         titulo: z
@@ -63,12 +57,6 @@ const updateCasoValidation = (req, res, next) => {
 
 const partialUpdateCasoValidation = (req, res, next) => {
   const updateCaso = z.object({
-    params: z.object({
-      id: z.coerce
-        .number({ error: "Id inválido" })
-        .int({ error: "Id inválido" })
-        .positive({ error: "Id inválido" }),
-    }),
     body: z
       .strictObject(
         {
