@@ -11,12 +11,12 @@ async function authenticateToken(req, res, next) {
   const token = cookieToken || headerToken;
 
   if (!token) {
-    throw new AppError(401, "Token não fornecido.");
+    next(new AppError(401, "Token não fornecido."));
   }
 
   jwt.verify(token, SECRET, (err, user) => {
     if (err) {
-      throw new AppError(403, "Token inválido ou expirado.");
+      next(new AppError(403, "Token inválido ou expirado."));
     }
 
     req.user = user;
