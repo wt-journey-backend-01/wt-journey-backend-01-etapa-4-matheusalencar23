@@ -70,7 +70,7 @@ async function updatePartialAgente(req, res) {
 
 async function deleteAgente(req, res) {
   const id = Number(req.params.id);
-  if (!id || !Number.isInteger(id)) {
+  if (!id || !Number.isInteger(id) || id < 0) {
     throw new AppError(404, "Id inválido");
   }
 
