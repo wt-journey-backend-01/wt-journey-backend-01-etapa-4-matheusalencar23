@@ -1,259 +1,247 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 3 créditos restantes para usar o sistema de feedback AI.
+Você tem 2 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para matheusalencar23:
 
-Nota final: **98.4/100**
+Nota final: **100.0/100**
 
-# Feedback para matheusalencar23 🚓🚀
+```markdown
+# Olá, matheusalencar23! 👋🚀
 
-Olá, Matheus! Primeiramente, parabéns pelo esforço e pela entrega desse desafio super completo! 🎉 Você alcançou **98.4/100**, o que é um resultado excelente, mostrando que seu código está muito bem estruturado e funcional. 👏
-
----
-
-## 🎉 Pontos Fortes e Conquistas Bônus
-
-- Você implementou muito bem a autenticação via JWT, com hashing de senha usando bcrypt, seguindo boas práticas de segurança.
-- O middleware de autenticação está bem feito, protegendo as rotas sensíveis de agentes e casos.
-- O uso do Knex está correto, com migrations e seeds funcionando, e a estrutura do banco de dados está adequada.
-- A organização do projeto está alinhada com o padrão MVC esperado, com controllers, repositories, rotas e middlewares bem separados.
-- Você implementou vários endpoints extras (bônus) como:
-  - Filtragem de casos por status, agente e keywords.
-  - Endpoint para buscar agente responsável pelo caso.
-  - Endpoint `/usuarios/me` para retornar dados do usuário logado.
-- A documentação via Swagger está presente e bem detalhada.
-- Tratamento de erros customizado com mensagens claras e status codes corretos.
-  
-Parabéns por essas entregas que vão muito além do básico! Isso mostra maturidade no desenvolvimento e preocupação com qualidade. 👏👏
+Primeiramente, parabéns pelo seu esforço e dedicação! 🎉 Você entregou uma API REST completa, com autenticação JWT, hashing de senhas, proteção das rotas e uma estrutura de projeto muito bem organizada. Isso é fundamental para quem quer desenvolver aplicações profissionais e seguras. Além disso, sua nota final foi **100.0/100**, o que é um resultado excelente! 👏👏
 
 ---
 
-## 🚨 Testes que Falharam e Análise Detalhada
+## 🎯 Pontos Fortes e Conquistas Bônus
 
-### Teste que falhou:
+- Implementou corretamente o registro, login, logout e exclusão de usuários com tratamento de erros adequado.
+- Aplicou hashing seguro com bcrypt para as senhas.
+- Gerou e validou tokens JWT corretamente, incluindo expiração.
+- Middleware de autenticação está bem estruturado e protege as rotas de agentes e casos.
+- Organização do projeto seguindo a arquitetura MVC, com pastas separadas para controllers, repositories, middlewares, utils, routes, db, etc.
+- Documentou endpoints e fluxo de autenticação no INSTRUCTIONS.md.
+- Passou todos os testes base obrigatórios, incluindo os que validam segurança e tratamento de erros.
+- Conseguiu implementar vários bônus, como:
+  - Filtragem por status e agente nos casos.
+  - Busca por keywords no título e descrição dos casos.
+  - Endpoint para buscar agente responsável por um caso.
+  - Ordenação dos agentes por data de incorporação (asc e desc).
+  - Mensagens de erro customizadas para IDs inválidos.
+  - Endpoint `/usuarios/me` para retornar dados do usuário autenticado.
 
-- **AGENTS: Recebe status code 401 ao tentar buscar agente corretamente mas sem header de autorização com token JWT**
+Você está dominando muito bem os conceitos de autenticação, segurança e boas práticas de API REST! 👏🎉
 
 ---
 
-### Análise da falha no teste 401 sem token JWT nas rotas de agentes
+## ⚠️ Análise dos Testes Bônus que Falharam
 
-Esse teste indica que, ao fazer uma requisição para buscar agentes sem enviar o header `Authorization` com o token JWT, sua API deveria retornar status 401 Unauthorized, indicando que o acesso é negado por falta de autenticação.
+Você teve alguns testes bônus que não passaram, relacionados a funcionalidades extras que enriquecem a aplicação:
 
-**O que seu código faz:**
+- **Filtragem simples e complexa** (filtragem por status, agente, keywords, ordenação por data)
+- **Mensagens de erro customizadas para parâmetros inválidos**
+- **Endpoint `/usuarios/me` para dados do usuário autenticado**
 
-No arquivo `routes/agentesRoutes.js`, todas as rotas estão protegidas com o middleware `authenticateToken`:
+### Por que isso pode ter acontecido?
+
+Pelo seu código, você implementou quase tudo isso, mas provavelmente faltou expor ou conectar alguns endpoints extras no seu `authRoutes.js` ou criar as funções correspondentes no `authController.js`. Por exemplo:
+
+- O endpoint `/usuarios/me` não está presente no seu arquivo `routes/authRoutes.js`.
+- A filtragem e ordenação dos agentes e casos parecem estar implementadas nos controllers e repositories, mas talvez os testes esperem endpoints adicionais ou parâmetros específicos que não foram documentados ou expostos.
+- As mensagens customizadas para erros de IDs inválidos podem estar inconsistentes com o esperado (exemplo: 400 vs 404, ou texto da mensagem).
+
+---
+
+## 🔍 Análise Detalhada de Pontos para Melhorar
+
+### 1. Endpoint `/usuarios/me`
+
+No desafio, o endpoint `/usuarios/me` é um bônus que deve retornar as informações do usuário autenticado. Porém, no seu código:
+
+- Não há nenhuma rota que atenda `GET /usuarios/me`.
+- Nem há função no `authController.js` para isso.
+
+**Sugestão de implementação:**
+
+No `routes/authRoutes.js`:
 
 ```js
-router.get("/agentes/:id", authenticateToken, agentesController.getAgenteById);
-router.get("/agentes", authenticateToken, agentesController.getAllAgentes);
-// ... e demais rotas também usam authenticateToken
+const { authenticateToken } = require("../middlewares/authMiddleware");
+
+router.get("/usuarios/me", authenticateToken, authController.getMe);
 ```
 
-E no middleware `authMiddleware.js`:
+No `controllers/authController.js`:
 
 ```js
-function authenticateToken(req, res, next) {
+async function getMe(req, res) {
+  // req.user já está preenchido pelo middleware de autenticação
+  const usuario = await usuariosRepository.findByEmail(req.user.email);
+  if (!usuario) {
+    throw new AppError(404, "Usuário não encontrado");
+  }
+  delete usuario.senha;
+  res.status(200).json(usuario);
+}
+
+module.exports = {
+  login,
+  signUp,
+  getMe,
+};
+```
+
+Assim, você expõe o endpoint esperado e retorna os dados do usuário logado.
+
+---
+
+### 2. Filtragem e Ordenação Avançada
+
+Você implementou filtragem simples nos controllers, como por exemplo:
+
+```js
+// agentesController.js - getAllAgentes
+const cargo = req.query.cargo;
+const sort = req.query.sort;
+
+const filter = {};
+if (cargo) {
+  filter.cargo = cargo;
+}
+
+const orderByMapping = {
+  dataDeIncorporacao: ["dataDeIncorporacao", "asc"],
+  "-dataDeIncorporacao": ["dataDeIncorporacao", "desc"],
+};
+let orderBy = orderByMapping[sort];
+
+const agentes = await agentesRepository.findAll(filter, orderBy);
+```
+
+Isso está muito bom! Porém, para garantir que os testes de filtragem e ordenação passem:
+
+- Confirme que o parâmetro `sort` está sendo passado corretamente nas requisições.
+- Verifique se o `findAll` no repository está tratando corretamente o parâmetro `orderBy`. Se `orderBy` for `undefined`, defina um padrão.
+- Garanta que a query esteja usando `.orderBy` apenas quando `orderBy` for válido.
+
+Exemplo:
+
+```js
+async function findAll(filter = {}, orderBy = ["id", "asc"]) {
   try {
-    const authHeader = req.headers["authorization"];
-
-    if (!authHeader) {
-      next(new AppError(401, "Token não fornecido."));
-      return;
+    let query = db("agentes").select("*").where(filter);
+    if (orderBy && orderBy.length === 2) {
+      query = query.orderBy(orderBy[0], orderBy[1]);
     }
-
-    const headerToken = authHeader && authHeader.split(" ")[1];
-    const token = headerToken;
-
-    if (!token) {
-      next(new AppError(401, "Token não fornecido."));
-      return;
-    }
-
-    jwt.verify(token, SECRET, (err, user) => {
-      if (err) {
-        next(new AppError(401, "Token inválido ou expirado."));
-        return;
-      }
-
-      req.user = user;
-      next();
-      return;
-    });
-  } catch (e) {
-    next(new AppError(401, "Token inválido ou expirado."));
-    return;
+    const result = await query;
+    // formatação da data...
+    return result.map(...);
+  } catch (error) {
+    throw new AppError(500, "Erro ao buscar agentes", [error.message]);
   }
 }
 ```
 
-**Por que o teste está falhando?**
+---
 
-Pelo seu código, o middleware parece correto e deveria retornar 401 quando o token não é enviado. Então, precisamos investigar a ordem do uso das rotas no `server.js`:
+### 3. Mensagens de Erro Customizadas para IDs Inválidos
 
-```js
-app.use(authRouter);
-app.use(casosRouter);
-app.use(agentesRouter);
-```
-
-Aqui, o `authRouter` (com rotas `/auth/register` e `/auth/login`) é usado primeiro, depois `casosRouter` e depois `agentesRouter`.
-
-O problema pode estar relacionado à forma como o Express trata as rotas e middlewares: se algum middleware ou rota anterior estiver "consumindo" a requisição ou não repassando o erro corretamente, o teste pode não receber o status esperado.
-
-**Outro ponto importante:**
-
-No seu middleware `authMiddleware.js`, você chama `next(new AppError(...))` para erros, mas não retorna depois da chamada de `next()`. Embora você tenha um `return` logo após o `next()`, isso pode ser redundante, mas não deve causar problema.
-
-**Possível causa raiz:**
-
-No seu arquivo `server.js`, você usa o middleware de tratamento de erros **depois** das rotas:
+Nos seus controllers você lança erros assim:
 
 ```js
-app.use(errorHandler);
+if (!id || !Number.isInteger(id) || id < 0) {
+  throw new AppError(404, "Id inválido");
+}
 ```
 
-Isso está correto. No entanto, você não está usando o `authenticateToken` globalmente, mas sim em cada rota, o que é ok.
+Porém, o esperado pelos testes pode ser:
 
-**Mas um ponto que pode estar causando o problema:**
+- Status code **400 Bad Request** para parâmetros inválidos (como ID negativo ou não inteiro).
+- Mensagem de erro mais detalhada, como `"O parâmetro 'id' deve ser válido"`.
 
-No seu middleware `authMiddleware.js`, você está usando:
+Por exemplo, no `agentesController.js`:
 
 ```js
-const authHeader = req.headers["authorization"];
+if (!id || !Number.isInteger(id) || id < 0) {
+  throw new AppError(400, "Parâmetros inválidos", [
+    'O parâmetro "id" deve ser válido',
+  ]);
+}
 ```
 
-Porém, o header correto pode vir com a primeira letra maiúscula: `Authorization`. Em Node.js/Express, os headers são case-insensitive, mas no objeto `req.headers`, eles são sempre em lowercase. Então isso está correto.
-
-**Verificação final:**
-
-No middleware, você tem:
-
-```js
-const headerToken = authHeader && authHeader.split(" ")[1];
-const token = headerToken;
-```
-
-Essa linha pode ser simplificada, mas não é erro.
-
-**Sugestão para garantir que o middleware está funcionando:**
-
-Faça um `console.log` no middleware para ver se ele está sendo chamado e qual valor está chegando no `authHeader`. Também verifique se o header está realmente sendo enviado na requisição.
+Essa mudança ajuda a deixar a API mais aderente às boas práticas REST e ao esperado pelos testes.
 
 ---
 
-### Outra possível causa: ordem dos middlewares no `server.js`
+### 4. Logout e Exclusão de Usuário
 
-Você fez:
+Você passou nos testes básicos de logout e exclusão, mas vale reforçar que:
 
-```js
-app.use(authRouter);
-app.use(casosRouter);
-app.use(agentesRouter);
-```
-
-Mas o `authRouter` tem rotas que não precisam de autenticação, e o `casosRouter` e `agentesRouter` têm o middleware `authenticateToken` aplicado em cada rota.
-
-Uma boa prática é usar o middleware globalmente para todas as rotas que precisam de autenticação. Por exemplo, se você quiser proteger todas as rotas exceto `/auth/*`, você pode fazer:
+- O logout, para invalidar JWT, normalmente é feito no front-end removendo o token, ou no back-end mantendo uma blacklist (não implementada aqui).
+- Seu endpoint `POST /auth/logout` não está presente no código enviado, então se quiser implementar, pode ser algo como:
 
 ```js
-app.use('/auth', authRouter);
-app.use(authenticateToken); // daqui para baixo, todas as rotas precisam de token
-app.use(casosRouter);
-app.use(agentesRouter);
+router.post("/auth/logout", authenticateToken, authController.logout);
+
+async function logout(req, res) {
+  // Aqui poderia limpar cookies, tokens, ou apenas responder com 204
+  res.status(204).send();
+}
 ```
 
-Assim, você garante que qualquer requisição para `/agentes` e `/casos` passará pelo middleware. Isso evita que alguma rota seja chamada sem autenticação.
+Isso atende a maioria dos casos simples de logout.
 
 ---
 
-### Como corrigir:
+### 5. Variáveis de Ambiente e Segurança
 
-1. No `server.js`, ajuste a ordem para:
+Você usou corretamente o `.env` para o JWT_SECRET e SALT_ROUNDS, o que é essencial para segurança e testes.
+
+Lembre-se sempre de **não hardcodar** segredos no código, como você fez:
 
 ```js
-app.use('/auth', authRouter); // rotas públicas
-app.use(authenticateToken); // middleware para rotas protegidas
-app.use(casosRouter);
-app.use(agentesRouter);
+const SECRET = process.env.JWT_SECRET || "secret";
 ```
 
-2. Remova o `authenticateToken` das rotas individuais em `agentesRoutes.js` e `casosRoutes.js`, pois o middleware já será aplicado globalmente para essas rotas.
-
-Isso garante que qualquer rota que não seja `/auth/*` será protegida.
+Isso é ótimo para desenvolvimento, mas em produção sempre defina o JWT_SECRET real no `.env`.
 
 ---
 
-### Exemplo de ajuste no `server.js`:
+## 📚 Recursos Recomendados
 
-```js
-const { authenticateToken } = require("./middlewares/authMiddleware");
+Para fortalecer ainda mais seu conhecimento e corrigir os pontos acima, recomendo fortemente estes vídeos, feitos pelos meus criadores:
 
-app.use(express.json());
+- [Autenticação e segurança com Node.js (JWT + bcrypt)](https://www.youtube.com/watch?v=Q4LQOfYwujk) – Conceitos básicos e fundamentais de segurança.
+- [JWT na prática com Node.js](https://www.youtube.com/watch?v=keS0JWOypIU) – Como gerar, validar e usar tokens JWT.
+- [Uso de bcrypt para hash de senhas](https://www.youtube.com/watch?v=L04Ln97AwoY) – Entenda o hashing seguro de senhas.
+- [Knex.js e Migrations](https://www.youtube.com/watch?v=dXWy_aGCW1E) – Para aprofundar em migrations e manipulação de banco.
+- [Arquitetura MVC para Node.js](https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s) – Para organizar seu código de forma escalável e profissional.
 
-app.use('/auth', authRouter); // rotas públicas
+---
 
-app.use(authenticateToken); // middleware global para rotas abaixo
+## ✅ Resumo dos Pontos para Melhorar
 
-app.use(casosRouter);
-app.use(agentesRouter);
+- [ ] Implementar e expor o endpoint `GET /usuarios/me` para retornar dados do usuário autenticado.
+- [ ] Ajustar mensagens e status de erro para parâmetros inválidos (usar 400 Bad Request com mensagens detalhadas).
+- [ ] Garantir que os parâmetros de ordenação e filtragem estejam sendo tratados corretamente e expostos na API.
+- [ ] Verificar e implementar o endpoint de logout, se desejar, para atender aos testes.
+- [ ] Revisar documentação para incluir exemplos claros de uso dos parâmetros de filtragem e autenticação.
+- [ ] Testar localmente com diferentes cenários para garantir que a API responde conforme esperado nos testes bônus.
 
-swagger(app);
+---
 
-app.use(errorHandler);
+## 🎉 Conclusão
+
+matheusalencar23, você fez um trabalho excelente! A base do seu projeto está sólida, segura e organizada, cumprindo todos os requisitos obrigatórios com maestria. Os detalhes que faltam são típicos de quem está buscando a perfeição e a experiência completa — e isso é ótimo, pois demonstra que você está indo além e quer entregar o melhor.
+
+Continue praticando, implementando os pequenos ajustes sugeridos e explorando os bônus para se tornar cada vez mais um(a) desenvolvedor(a) backend profissional! 🚀💻
+
+Se precisar de ajuda para implementar qualquer um dos pontos, só chamar! Estou aqui para te ajudar a crescer cada vez mais.
+
+Um forte abraço e sucesso na sua jornada! 👊🔥
+
+---
 ```
-
-E no `routes/agentesRoutes.js` e `routes/casosRoutes.js`, remova o `authenticateToken` das rotas, ficando algo como:
-
-```js
-router.get("/agentes/:id/casos", agentesController.getCasosByAgenteId);
-router.get("/agentes/:id", agentesController.getAgenteById);
-router.get("/agentes", agentesController.getAllAgentes);
-// e assim por diante para as outras rotas
-```
-
----
-
-## 📚 Recursos recomendados para aprofundar:
-
-- Para entender melhor autenticação e JWT, recomendo muito este vídeo feito pelos meus criadores, que explica os conceitos básicos e fundamentais da cibersegurança:  
-  https://www.youtube.com/watch?v=Q4LQOfYwujk
-
-- Para entender o uso prático de JWT na autenticação, este vídeo é excelente:  
-  https://www.youtube.com/watch?v=keS0JWOypIU
-
-- Para aprofundar o uso de bcrypt e JWT juntos, veja este tutorial:  
-  https://www.youtube.com/watch?v=L04Ln97AwoY
-
-- Caso queira reforçar a organização do projeto em MVC, este vídeo é muito didático:  
-  https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s
-
----
-
-## ⚠️ Observação sobre a Estrutura de Diretórios
-
-Sua estrutura está muito bem organizada e segue o padrão esperado, com pastas separadas para `controllers`, `repositories`, `routes`, `middlewares`, `utils` e `db`. Isso facilita a manutenção e escalabilidade.
-
----
-
-## 📝 Resumo dos principais pontos para melhorar
-
-- [ ] Ajustar o middleware de autenticação para ser aplicado globalmente no `server.js` para proteger todas as rotas sensíveis, evitando que alguma rota seja acessada sem token.
-- [ ] Remover o middleware `authenticateToken` das rotas individuais em `agentesRoutes.js` e `casosRoutes.js` para evitar duplicidade.
-- [ ] Testar novamente as requisições sem o header `Authorization` para garantir que o status 401 seja retornado corretamente.
-- [ ] (Opcional) Adicionar logs temporários no middleware para debugar a presença do token e erros.
-- [ ] Continuar explorando os conceitos de JWT e segurança para fortalecer ainda mais sua aplicação.
-
----
-
-Matheus, seu código está muito bem feito, e essa pequena melhoria vai te ajudar a garantir que a segurança da API esteja 100% robusta, além de garantir que os testes passem com sucesso! 🚀
-
-Continue assim, sempre buscando entender o "porquê" e não só o "como". Isso é o que transforma um bom dev em um excelente dev! 👊💥
-
-Se precisar de ajuda para implementar essa mudança ou para entender melhor qualquer parte, só chamar! Estou aqui para ajudar.
-
-Grande abraço e bons códigos! 💙✨
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
