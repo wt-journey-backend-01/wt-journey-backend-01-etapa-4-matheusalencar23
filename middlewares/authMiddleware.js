@@ -8,30 +8,25 @@ function authenticateToken(req, res, next) {
     const authHeader = req.headers["authorization"];
 
     if (!authHeader) {
-      next(new AppError(401, "Token não fornecido."));
-      return;
+      return next(new AppError(401, "Token não fornecido."));
     }
 
     const token = authHeader && authHeader.split(" ")[1];
 
     if (!token) {
-      next(new AppError(401, "Token não fornecido."));
-      return;
+      return next(new AppError(401, "Token não fornecido."));
     }
 
     jwt.verify(token, SECRET, (err, user) => {
       if (err) {
-        next(new AppError(401, "Token inválido ou expirado."));
-        return;
+        return next(new AppError(401, "Token inválido ou expirado."));
       }
 
       req.user = user;
       next();
-      return;
     });
   } catch (e) {
     next(new AppError(401, "Token inválido ou expirado."));
-    return;
   }
 }
 
