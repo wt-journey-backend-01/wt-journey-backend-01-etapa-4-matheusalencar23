@@ -1,152 +1,162 @@
 <sup>Esse é um feedback gerado por IA, ele pode conter erros.</sup>
 
-Você tem 2 créditos restantes para usar o sistema de feedback AI.
+Você tem 1 créditos restantes para usar o sistema de feedback AI.
 
 # Feedback para matheusalencar23:
 
 Nota final: **100.0/100**
 
-```markdown
-# Olá, matheusalencar23! 👋🚀
-
-Primeiramente, parabéns pelo seu esforço e dedicação! 🎉 Você entregou uma API REST completa, com autenticação JWT, hashing de senhas, proteção das rotas e uma estrutura de projeto muito bem organizada. Isso é fundamental para quem quer desenvolver aplicações profissionais e seguras. Além disso, sua nota final foi **100.0/100**, o que é um resultado excelente! 👏👏
+Olá, matheusalencar23! 🚀 Parabéns pelo seu excelente trabalho! Você alcançou a nota máxima de 100.0/100, o que já demonstra um domínio muito bom dos conceitos e práticas necessárias para construir uma API RESTful segura, usando Node.js, Express, PostgreSQL e JWT. 🎉👏
 
 ---
 
-## 🎯 Pontos Fortes e Conquistas Bônus
+### 🎉 Pontos Fortes que Merecem Destaque
 
-- Implementou corretamente o registro, login, logout e exclusão de usuários com tratamento de erros adequado.
-- Aplicou hashing seguro com bcrypt para as senhas.
-- Gerou e validou tokens JWT corretamente, incluindo expiração.
-- Middleware de autenticação está bem estruturado e protege as rotas de agentes e casos.
-- Organização do projeto seguindo a arquitetura MVC, com pastas separadas para controllers, repositories, middlewares, utils, routes, db, etc.
-- Documentou endpoints e fluxo de autenticação no INSTRUCTIONS.md.
-- Passou todos os testes base obrigatórios, incluindo os que validam segurança e tratamento de erros.
-- Conseguiu implementar vários bônus, como:
-  - Filtragem por status e agente nos casos.
-  - Busca por keywords no título e descrição dos casos.
-  - Endpoint para buscar agente responsável por um caso.
-  - Ordenação dos agentes por data de incorporação (asc e desc).
-  - Mensagens de erro customizadas para IDs inválidos.
+- Sua API está muito bem estruturada, seguindo a arquitetura MVC com pastas claras para controllers, repositories, rotas, middlewares e utils. Isso facilita a manutenção e escalabilidade do projeto.
+- Implementou corretamente a autenticação com JWT, incluindo o hashing das senhas com bcrypt, proteção das rotas sensíveis, e o uso do middleware para validar o token.
+- Sua documentação via Swagger está bem detalhada, com exemplos e schemas que ajudam a entender os endpoints e os dados esperados.
+- Os testes base passaram todos, o que indica que os requisitos obrigatórios do projeto estão cumpridos com qualidade.
+- Você também entregou vários bônus importantes, como:
   - Endpoint `/usuarios/me` para retornar dados do usuário autenticado.
-
-Você está dominando muito bem os conceitos de autenticação, segurança e boas práticas de API REST! 👏🎉
-
----
-
-## ⚠️ Análise dos Testes Bônus que Falharam
-
-Você teve alguns testes bônus que não passaram, relacionados a funcionalidades extras que enriquecem a aplicação:
-
-- **Filtragem simples e complexa** (filtragem por status, agente, keywords, ordenação por data)
-- **Mensagens de erro customizadas para parâmetros inválidos**
-- **Endpoint `/usuarios/me` para dados do usuário autenticado**
-
-### Por que isso pode ter acontecido?
-
-Pelo seu código, você implementou quase tudo isso, mas provavelmente faltou expor ou conectar alguns endpoints extras no seu `authRoutes.js` ou criar as funções correspondentes no `authController.js`. Por exemplo:
-
-- O endpoint `/usuarios/me` não está presente no seu arquivo `routes/authRoutes.js`.
-- A filtragem e ordenação dos agentes e casos parecem estar implementadas nos controllers e repositories, mas talvez os testes esperem endpoints adicionais ou parâmetros específicos que não foram documentados ou expostos.
-- As mensagens customizadas para erros de IDs inválidos podem estar inconsistentes com o esperado (exemplo: 400 vs 404, ou texto da mensagem).
+  - Filtragem avançada para agentes e casos, incluindo ordenação por data de incorporação.
+  - Mensagens de erro customizadas para parâmetros inválidos.
+  - Busca de casos por keywords no título e descrição.
+  - Busca do agente responsável por um caso.
+  
+Isso mostra que você foi além do básico e entregou uma aplicação robusta e profissional. Muito bom! 👏👏
 
 ---
 
-## 🔍 Análise Detalhada de Pontos para Melhorar
+### 🔍 Análise dos Testes Bônus que Falharam
 
-### 1. Endpoint `/usuarios/me`
+Você teve alguns testes bônus que não passaram, todos relacionados a funcionalidades extras e filtros avançados. Vamos analisar juntos cada um para você entender o que pode melhorar:
 
-No desafio, o endpoint `/usuarios/me` é um bônus que deve retornar as informações do usuário autenticado. Porém, no seu código:
+---
 
-- Não há nenhuma rota que atenda `GET /usuarios/me`.
-- Nem há função no `authController.js` para isso.
+#### 1. **Simple Filtering: Estudante implementou endpoint de filtragem de caso por status corretamente**
 
-**Sugestão de implementação:**
-
-No `routes/authRoutes.js`:
+- **Possível motivo:** Você implementou o filtro por status em `casosController.js` no método `getAllCasos`:
 
 ```js
-const { authenticateToken } = require("../middlewares/authMiddleware");
+async function getAllCasos(req, res) {
+  const agenteId = req.query.agente_id;
+  const status = req.query.status;
 
-router.get("/usuarios/me", authenticateToken, authController.getMe);
-```
-
-No `controllers/authController.js`:
-
-```js
-async function getMe(req, res) {
-  // req.user já está preenchido pelo middleware de autenticação
-  const usuario = await usuariosRepository.findByEmail(req.user.email);
-  if (!usuario) {
-    throw new AppError(404, "Usuário não encontrado");
+  const filter = {};
+  if (agenteId) {
+    filter.agente_id = agenteId;
   }
-  delete usuario.senha;
-  res.status(200).json(usuario);
-}
 
-module.exports = {
-  login,
-  signUp,
-  getMe,
-};
+  if (status) {
+    filter.status = status;
+  }
+
+  const casos = await casosRepository.findAll(filter);
+  res.json(casos);
+}
 ```
 
-Assim, você expõe o endpoint esperado e retorna os dados do usuário logado.
+- Essa abordagem está correta, mas para garantir que o filtro funcione corretamente, o valor do status deve ser validado para aceitar apenas `"aberto"` ou `"solucionado"`. Caso contrário, pode retornar casos incorretos ou vazios.
+
+- **Sugestão:** Adicione uma validação para o parâmetro `status` antes de aplicar o filtro, retornando erro 400 se o status for inválido.
 
 ---
 
-### 2. Filtragem e Ordenação Avançada
+#### 2. **Simple Filtering: Estudante implementou endpoint de busca de agente responsável por caso**
 
-Você implementou filtragem simples nos controllers, como por exemplo:
+- Você implementou o endpoint `/casos/:caso_id/agente` e o método `getAgenteByCasoId` corretamente, com validações de ID e retornos apropriados.
+
+- Se esse teste falhou, pode ser que o teste espere um retorno em um formato específico, por exemplo, um objeto JSON e não um array, ou que o status esteja diferente do esperado.
+
+- **Sugestão:** Verifique se o retorno está exatamente conforme esperado (status 200, JSON do agente como objeto único).
+
+---
+
+#### 3. **Simple Filtering: Estudante implementou endpoint de filtragem de caso por agente corretamente**
+
+- O filtro por agente está implementado no mesmo método `getAllCasos` com:
 
 ```js
-// agentesController.js - getAllAgentes
-const cargo = req.query.cargo;
-const sort = req.query.sort;
-
-const filter = {};
-if (cargo) {
-  filter.cargo = cargo;
+if (agenteId) {
+  filter.agente_id = agenteId;
 }
+```
 
+- Certifique-se que o parâmetro `agente_id` está sendo passado corretamente como número e validado.
+
+- **Sugestão:** Faça uma validação para garantir que `agente_id` seja um número inteiro positivo, e retorne erro 400 caso contrário.
+
+---
+
+#### 4. **Simple Filtering: Estudante implementou endpoint de filtragem de casos por keywords no título e/ou descrição**
+
+- O método `filter` no `casosController.js` chama o método `filter` do `casosRepository` que executa uma query com `ilike` para título e descrição:
+
+```js
+async function filter(term) {
+  try {
+    const result = await db("casos")
+      .select("*")
+      .where("titulo", "ilike", `%${term}%`)
+      .orWhere("descricao", "ilike", `%${term}%`);
+
+    console.log(result);
+    return result;
+  } catch (error) {
+    throw new AppError(500, "Erro ao buscar casos", [error.message]);
+  }
+}
+```
+
+- Essa implementação está correta. Se o teste falhou, pode ser por algum detalhe no endpoint, como método HTTP, rota, ou tratamento do parâmetro `q`.
+
+- **Sugestão:** Confirme que o endpoint está definido como `GET /casos/search` e que o parâmetro `q` está sendo corretamente lido e passado para o método.
+
+---
+
+#### 5. **Simple filtering: Estudante implementou endpoint de busca de casos do agente**
+
+- O endpoint `/agentes/:id/casos` está implementado e chama o método `getCasosByAgenteId` que busca o agente e depois os casos:
+
+```js
+async function getCasosByAgenteId(req, res) {
+  const agenteId = req.params.id;
+  const agente = await agentesRepository.findById(agenteId);
+  if (!agente) {
+    throw new AppError(404, "Nenhum agente encontrado para o id especificado");
+  }
+  const casos = await casosRepository.findAll({ agente_id: agenteId });
+  res.json(casos);
+}
+```
+
+- Essa implementação parece correta. Se o teste falhou, pode ser por falta de validação do ID (tipo e valor), ou formato do retorno.
+
+- **Sugestão:** Adicione validação para garantir que `agenteId` seja um número inteiro positivo e retorne erro 400 caso contrário.
+
+---
+
+#### 6. **Complex Filtering: Estudante implementou endpoint de filtragem de agente por data de incorporação com sorting em ordem crescente e decrescente corretamente**
+
+- O método `getAllAgentes` tem um mapeamento para ordenar por `dataDeIncorporacao`:
+
+```js
 const orderByMapping = {
   dataDeIncorporacao: ["dataDeIncorporacao", "asc"],
   "-dataDeIncorporacao": ["dataDeIncorporacao", "desc"],
 };
 let orderBy = orderByMapping[sort];
-
-const agentes = await agentesRepository.findAll(filter, orderBy);
 ```
 
-Isso está muito bom! Porém, para garantir que os testes de filtragem e ordenação passem:
+- Porém, se o parâmetro `sort` não for um dos dois valores esperados, `orderBy` será `undefined`. Isso pode causar problemas na query do Knex.
 
-- Confirme que o parâmetro `sort` está sendo passado corretamente nas requisições.
-- Verifique se o `findAll` no repository está tratando corretamente o parâmetro `orderBy`. Se `orderBy` for `undefined`, defina um padrão.
-- Garanta que a query esteja usando `.orderBy` apenas quando `orderBy` for válido.
-
-Exemplo:
-
-```js
-async function findAll(filter = {}, orderBy = ["id", "asc"]) {
-  try {
-    let query = db("agentes").select("*").where(filter);
-    if (orderBy && orderBy.length === 2) {
-      query = query.orderBy(orderBy[0], orderBy[1]);
-    }
-    const result = await query;
-    // formatação da data...
-    return result.map(...);
-  } catch (error) {
-    throw new AppError(500, "Erro ao buscar agentes", [error.message]);
-  }
-}
-```
+- **Sugestão:** Defina um fallback para `orderBy` quando o parâmetro `sort` for inválido ou ausente, como `["id", "asc"]`.
 
 ---
 
-### 3. Mensagens de Erro Customizadas para IDs Inválidos
+#### 7. **Custom Error: Estudante implementou mensagens de erro customizadas para argumentos de agente e caso inválidos corretamente**
 
-Nos seus controllers você lança erros assim:
+- Você lançou erros personalizados com a classe `AppError` em diversos pontos, como:
 
 ```js
 if (!id || !Number.isInteger(id) || id < 0) {
@@ -154,94 +164,88 @@ if (!id || !Number.isInteger(id) || id < 0) {
 }
 ```
 
-Porém, o esperado pelos testes pode ser:
+- Isso está ótimo! Se houve falha, pode ser que o código esteja retornando status 404 para erros de validação que deveriam ser 400 (Bad Request). IDs inválidos devem retornar 400, pois o recurso não foi encontrado por um parâmetro inválido, não porque ele não existe.
 
-- Status code **400 Bad Request** para parâmetros inválidos (como ID negativo ou não inteiro).
-- Mensagem de erro mais detalhada, como `"O parâmetro 'id' deve ser válido"`.
-
-Por exemplo, no `agentesController.js`:
+- **Sugestão:** Ajuste os status dos erros de validação para 400. Por exemplo:
 
 ```js
 if (!id || !Number.isInteger(id) || id < 0) {
-  throw new AppError(400, "Parâmetros inválidos", [
-    'O parâmetro "id" deve ser válido',
-  ]);
+  throw new AppError(400, "Parâmetro 'id' inválido");
 }
 ```
 
-Essa mudança ajuda a deixar a API mais aderente às boas práticas REST e ao esperado pelos testes.
-
 ---
 
-### 4. Logout e Exclusão de Usuário
+#### 8. **User details: /usuarios/me retorna os dados do usuário logado e status code 200**
 
-Você passou nos testes básicos de logout e exclusão, mas vale reforçar que:
+- Esse endpoint não está presente no código que você enviou. Para implementar, crie uma rota protegida que retorne os dados do usuário com base no token JWT.
 
-- O logout, para invalidar JWT, normalmente é feito no front-end removendo o token, ou no back-end mantendo uma blacklist (não implementada aqui).
-- Seu endpoint `POST /auth/logout` não está presente no código enviado, então se quiser implementar, pode ser algo como:
+- **Sugestão:** Implemente em `routes/authRoutes.js`:
 
 ```js
-router.post("/auth/logout", authenticateToken, authController.logout);
+router.get("/usuarios/me", authenticateToken, authController.getUserDetails);
+```
 
-async function logout(req, res) {
-  // Aqui poderia limpar cookies, tokens, ou apenas responder com 204
-  res.status(204).send();
+- E no `authController.js`:
+
+```js
+async function getUserDetails(req, res) {
+  const user = req.user; // dados do token
+  res.status(200).json(user);
 }
 ```
 
-Isso atende a maioria dos casos simples de logout.
+---
+
+### 🛠️ Recomendações Gerais para Melhorar
+
+- **Validação mais rigorosa dos parâmetros de entrada:** IDs, status, emails, etc. Use bibliotecas como `zod` (que você já tem) para garantir isso antes de chamar os controllers.
+- **Status codes mais precisos:** Use 400 para erros de validação (parâmetros inválidos), 401 para autenticação, 403 para autorização, 404 para recursos não encontrados, e 500 para erros internos.
+- **Tratamento de erros consistente:** Continue usando sua classe `AppError` para padronizar as respostas de erro.
+- **Implementar logout e exclusão de usuários:** Seu código tem login e registro, mas não vi o logout nem delete de usuários implementados. São requisitos do projeto e ajudam a fechar o ciclo de autenticação.
 
 ---
 
-### 5. Variáveis de Ambiente e Segurança
+### 📚 Recursos que Recomendo para Aprimorar Ainda Mais
 
-Você usou corretamente o `.env` para o JWT_SECRET e SALT_ROUNDS, o que é essencial para segurança e testes.
+- Para entender melhor a autenticação e JWT, recomendo muito este vídeo, feito pelos meus criadores, que explica os conceitos básicos e fundamentais da cibersegurança:  
+  https://www.youtube.com/watch?v=Q4LQOfYwujk
 
-Lembre-se sempre de **não hardcodar** segredos no código, como você fez:
+- Para aprofundar no uso prático de JWT, este vídeo é excelente:  
+  https://www.youtube.com/watch?v=keS0JWOypIU
 
-```js
-const SECRET = process.env.JWT_SECRET || "secret";
-```
+- Para entender o uso combinado de JWT e bcrypt para segurança, veja:  
+  https://www.youtube.com/watch?v=L04Ln97AwoY
 
-Isso é ótimo para desenvolvimento, mas em produção sempre defina o JWT_SECRET real no `.env`.
+- Para aprimorar o uso do Knex e manipulação do banco, este guia detalhado do Knex Query Builder é muito útil:  
+  https://www.youtube.com/watch?v=GLwHSs7t3Ns&t=4s
 
----
-
-## 📚 Recursos Recomendados
-
-Para fortalecer ainda mais seu conhecimento e corrigir os pontos acima, recomendo fortemente estes vídeos, feitos pelos meus criadores:
-
-- [Autenticação e segurança com Node.js (JWT + bcrypt)](https://www.youtube.com/watch?v=Q4LQOfYwujk) – Conceitos básicos e fundamentais de segurança.
-- [JWT na prática com Node.js](https://www.youtube.com/watch?v=keS0JWOypIU) – Como gerar, validar e usar tokens JWT.
-- [Uso de bcrypt para hash de senhas](https://www.youtube.com/watch?v=L04Ln97AwoY) – Entenda o hashing seguro de senhas.
-- [Knex.js e Migrations](https://www.youtube.com/watch?v=dXWy_aGCW1E) – Para aprofundar em migrations e manipulação de banco.
-- [Arquitetura MVC para Node.js](https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s) – Para organizar seu código de forma escalável e profissional.
+- Para organizar seu código em MVC e boas práticas, recomendo:  
+  https://www.youtube.com/watch?v=bGN_xNc4A1k&t=3s
 
 ---
 
-## ✅ Resumo dos Pontos para Melhorar
+### ✅ Resumo dos Principais Pontos para Focar
 
-- [ ] Implementar e expor o endpoint `GET /usuarios/me` para retornar dados do usuário autenticado.
-- [ ] Ajustar mensagens e status de erro para parâmetros inválidos (usar 400 Bad Request com mensagens detalhadas).
-- [ ] Garantir que os parâmetros de ordenação e filtragem estejam sendo tratados corretamente e expostos na API.
-- [ ] Verificar e implementar o endpoint de logout, se desejar, para atender aos testes.
-- [ ] Revisar documentação para incluir exemplos claros de uso dos parâmetros de filtragem e autenticação.
-- [ ] Testar localmente com diferentes cenários para garantir que a API responde conforme esperado nos testes bônus.
-
----
-
-## 🎉 Conclusão
-
-matheusalencar23, você fez um trabalho excelente! A base do seu projeto está sólida, segura e organizada, cumprindo todos os requisitos obrigatórios com maestria. Os detalhes que faltam são típicos de quem está buscando a perfeição e a experiência completa — e isso é ótimo, pois demonstra que você está indo além e quer entregar o melhor.
-
-Continue praticando, implementando os pequenos ajustes sugeridos e explorando os bônus para se tornar cada vez mais um(a) desenvolvedor(a) backend profissional! 🚀💻
-
-Se precisar de ajuda para implementar qualquer um dos pontos, só chamar! Estou aqui para te ajudar a crescer cada vez mais.
-
-Um forte abraço e sucesso na sua jornada! 👊🔥
+- [ ] Adicionar validações mais rigorosas para parâmetros de entrada (IDs, status, emails).
+- [ ] Ajustar status codes para erros de validação para 400 (Bad Request), não 404.
+- [ ] Implementar o endpoint `/usuarios/me` para retornar dados do usuário autenticado.
+- [ ] Garantir que o filtro por status em casos aceite apenas valores válidos.
+- [ ] Validar o parâmetro `sort` em agentes para evitar valores undefined.
+- [ ] Implementar logout e exclusão de usuários conforme requisitos.
+- [ ] Revisar os formatos de retorno para garantir conformidade com o esperado nos testes bônus.
 
 ---
-```
+
+### 🌟 Conclusão
+
+Seu projeto está muito bem feito, com uma base sólida e funcionalidades completas para os requisitos principais. Os testes bônus indicam que você está no caminho certo para entregar uma API profissional e segura, só faltando alguns ajustes finos para garantir robustez e conformidade total.
+
+Continue nesse ritmo, aprimorando as validações, o tratamento de erros e implementando os endpoints extras. Com certeza você está construindo um conhecimento que vai te levar longe como desenvolvedor backend!
+
+Qualquer dúvida, estou aqui para ajudar. Parabéns novamente pela dedicação e pelo excelente código entregue! 🚀✨
+
+Um abraço e bons códigos! 👨‍💻👩‍💻
 
 > Caso queira tirar uma dúvida específica, entre em contato com o Chapter no nosso [discord](https://discord.gg/DryuHVnz).
 
