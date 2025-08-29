@@ -23,10 +23,10 @@ function authenticateToken(req, res, next) {
       }
 
       req.user = user;
-      next();
+      return next();
     });
   } catch (e) {
-    next(new AppError(401, "Token inválido ou expirado."));
+    return next();
   }
 }
 
